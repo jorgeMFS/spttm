@@ -38,7 +38,9 @@ sptm::sptm(Args args):str(args.input_file,args.alphabet_size){
     auto diff = get_diff_amplitudes(tape_length);    auto nrc_vector = this->str.readinput(mdl);
     index = std::min_element(nrc_vector.begin(), nrc_vector.end()) - nrc_vector.begin();
     std::cout << nrc_vector[index] << "\t" << diff << std::endl;
-    sptm::update();
+    while(true){
+        sptm::update();
+    }
 }
 
 void sptm::update(){
