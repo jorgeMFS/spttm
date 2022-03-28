@@ -66,7 +66,7 @@ void sptm::update(){
     std::cout << nrc_value << "\t" << diff << std::endl;
 }; 
 
-std::tuple<StateMatrix, unsigned long long, unsigned int, double, unsigned int> sptm::read_file() {
+std::tuple<StateMatrix, unsigned long long, unsigned int, double, unsigned int> read_file() {
     std::string line;
     std::tuple<StateMatrix, unsigned long long, unsigned int, double, unsigned int> candidate;
     std::getline (std::cin, line);

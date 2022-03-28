@@ -13,7 +13,18 @@ objects = src/tmId.o \
 		  src/util.o \
 		  src/sptm.o \
 		  src/read_input.o \
- 		  src/main.o 
+ 		  src/main.o
+
+objects2 = src/tmId.o \
+		  src/turingMachine.o \
+		  src/interactiveMarkovModel.o \
+		  src/stringProcess.o \
+		  src/markovTable.o \
+		  src/parseArgs.o \
+		  src/util.o \
+		  src/sptm.o \
+		  src/read_input.o \
+ 		  src/main2.o 
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -21,14 +32,22 @@ objects = src/tmId.o \
 sptm: $(objects)
 	$(CXX) $(LFLAGS) $^ -o $@
 
-all: sptm
+run: $(objects2)
+	$(CXX) $(LFLAGS) $^ -o $@
+
+
+all: sptm \
+	run
 
 clean:
 	rm -f src/*.o sptm
+	rm -f src/*.o run
 
 
 # Dependencies
 main.o: src/main.cpp src/parseArgs.h src/stringProcess.h
+
+main2.o: src/main2.cpp src/interactiveMarkovModel.h
 
 src/tmId.o: src/tmId.cpp src/tmId.h 
 

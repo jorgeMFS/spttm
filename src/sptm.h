@@ -23,7 +23,7 @@ struct sptm{
     unsigned int input_amplitude;
     sptm(Args args);
     void update(); 
-    std::tuple<StateMatrix, unsigned long long, unsigned int, double, unsigned int>read_file();
     double get_diff_amplitudes(unsigned int & tape_length);
 
 };
+    std::tuple<StateMatrix, unsigned long long, unsigned int, double, unsigned int>read_file();
