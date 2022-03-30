@@ -32,6 +32,7 @@ struct StringProcess{
     /** Returns copy of input vector */    
     std::vector<char> get_input_vector() const;
     std::vector<std::vector<unsigned int>> get_all_transcribed_vectors() const;
+    std::vector<unsigned int> get_transcribed_vector(unsigned int const & index) const;
     /** Sets new input vector and recalculates normalizer*/    
     void set_input_vector_and_normalize(std::vector<unsigned int>& new_input_vector);
     void print_map(std::map<char, unsigned int> & map) const;

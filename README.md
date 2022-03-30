@@ -38,6 +38,23 @@ Input to program while running code:
 20: alpha of markov model
 7568:seed
 ```
+
+Outputs:
+The outputs from the program provide every 10 iterations of the Turing Machine, the following features:
+
+- NRC: Normalize Relative Compression (for a given k)
+- DTA: Normalize Absolute Difference between sizes of the Input and generated Turing Machine Tape
+- HS: Hit Score element by element between the Input and generated Turing Machine Tape
+- ED: Euclidean Distance between the Input and generated Turing Machine Tape
+- PEL: Variation in diference for each alphabet letter between the Input and generated Turing Machine Tape
+```
+NRC DTA HS  ED  PEL
+```
+E.g.
+```
+1.88525 0.419048        0.639344        3.48925e+10     0.362538        0.0680838
+```
+
 ## ISSUES
 Please let us know if there is any
 [issues](https://github.com/jorgeMFS/SPPTM/issues).

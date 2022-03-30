@@ -72,6 +72,11 @@ std::vector<std::vector<unsigned int>> StringProcess::get_all_transcribed_vector
   return this->transcribed_vectors;
 }
 
+std::vector<unsigned int> StringProcess::get_transcribed_vector(unsigned int const & index) const{
+  return this->transcribed_vectors[index];
+}
+
+
 void StringProcess::set_input_vector_and_normalize(std::vector<unsigned int>& new_input_vector){
   this->transcribed_vectors[0] = new_input_vector;
   this->normalization_base();
