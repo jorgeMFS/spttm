@@ -54,7 +54,7 @@ struct StringProcess{
     */
     double readinput(MarkovTable& markovTable, unsigned int index) const;
     std::vector<double> readinput(MarkovTable& markovTable) const;
-
+    std::vector<double> readinput_multimarkovmodel(std::vector<MarkovTable>& markovTableVector, unsigned int index) const;
     /**  Returns size_t of the maximum alphabet cardinality between the input inserted by the user (alphabet_size) and the input string.
      * @param alphabet_size the cardinality of the alphabet
     */

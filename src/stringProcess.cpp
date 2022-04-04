@@ -99,13 +99,6 @@ std::vector<double> StringProcess::readinput(MarkovTable& markovTable) const {
     double value = 0;
     for(auto it = vec.begin(); it!= vec.end() - markovTable.k; ++it){
       value += markovTable.probability(&*it);
-      // auto subvectorOfMarkovTable = markovTable.getLine(&*it); //here
-      // auto indxvalue = markovTable.at(&*it) + (1 * markovTable.alpha); //here
-      // std::transform(subvectorOfMarkovTable.begin(), subvectorOfMarkovTable.end(), subvectorOfMarkovTable.begin(), bind2nd(std::plus<int>(), 1)); 
-      // auto logaritm = StringProcess::calculateLog(indxvalue,valarray<unsigned int>(subvectorOfMarkovTable.data(), subvectorOfMarkovTable.size()).sum());
-      // double denominator = sum_all_elements_vector(subvectorOfMarkovTable) + markovTable.alphSz*markovTable.alpha; //new
-      // double logaritm = calculateLog(indxvalue, denominator); //new
-      // value += logaritm;
     }
     nrc_values.push_back(value/this->normalizer);
     markovTable.reset();
@@ -119,19 +112,27 @@ double StringProcess::readinput(MarkovTable& markovTable, unsigned int index) co
 
   for(auto it = vec.begin(); it!= vec.end() - markovTable.k; ++it){
     value += markovTable.probability(&*it);
-
-    // auto subvectorOfMarkovTable = markovTable.getLine(&*it); //here
-    // auto indxvalue = markovTable.at(&*it) + (1 * markovTable.alpha); //here
-    
-    // std::transform(subvectorOfMarkovTable.begin(), subvectorOfMarkovTable.end(), subvectorOfMarkovTable.begin(), bind2nd(std::plus<int>(), 1)); 
-    // auto logaritm = this->calculateLog(indxvalue, valarray<unsigned int>(subvectorOfMarkovTable.data(), subvectorOfMarkovTable.size()).sum());
-    // double denominator = sum_all_elements_vector(subvectorOfMarkovTable) + markovTable.alphSz*markovTable.alpha; //new
-    // double logaritm = calculateLog(indxvalue, denominator); //new
-    // value += logaritm;
   }
   markovTable.reset();
   return (value/this->normalizer);
 }
+
+std::vector<double> StringProcess::readinput_multimarkovmodel(std::vector<MarkovTable>& markovTableVector, unsigned int index) const {
+  std::vector<double> nrc_values;
+  auto vec = this->transcribed_vectors[index];
+  for (auto markovTable: markovTableVector){
+    double value = 0;
+    for(auto it = vec.begin(); it!= vec.end() - markovTable.k; ++it){
+      value += markovTable.probability(&*it);
+    }
+    nrc_values.push_back(value/this->normalizer);
+    markovTable.reset();
+  }
+  std::cout<<nrc_values.size()<<std::endl;
+  return nrc_values;
+
+}
+
 
 double StringProcess::calculateLog(double index_value, double index_sum){
     auto value = index_value / index_sum;   

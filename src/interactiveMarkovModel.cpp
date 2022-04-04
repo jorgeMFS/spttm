@@ -30,10 +30,9 @@ unsigned int InteractiveMarkovModel::obtain_sum_occurrences_markov_table() const
     return std::accumulate(vector.begin(), vector.end(), 0);
 }
 
-
 void InteractiveMarkovModel::fill(const Tape &tape){
 
-    this->mrkvTable.reset(); // here is a reset to the mkv table
+    this->mrkvTable.reset(); // here is a reset to the mkvtable
 
     auto b = begin(tape.tape) + tape.ind_left + 1;    
     auto e = begin(tape.tape) + tape.ind_right - this->mrkvTable.k; 
@@ -41,6 +40,7 @@ void InteractiveMarkovModel::fill(const Tape &tape){
         this->mrkvTable.at(&*it) += 1;
     }
 }
+
 void InteractiveMarkovModel::add_other_tape(const Tape& tape){
     auto b = begin(tape.tape) + tape.ind_left + 1;    
     auto e = begin(tape.tape) + tape.ind_right - this->mrkvTable.k; 
