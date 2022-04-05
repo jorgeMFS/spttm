@@ -38,7 +38,6 @@ sptm::sptm(Args args):str(args.input_file,args.alphabet_size){
             auto mdls = all_models.get_markov_tables();
             auto tape_length = tm.get_tape_size();
             auto diff = get_diff_amplitudes(tape_length);    
-            
             auto nrc_vector = this->str.readinput(mdl);
             index = std::min_element(nrc_vector.begin(), nrc_vector.end()) - nrc_vector.begin();
             auto nrc_values = this->str.readinput_multimarkovmodel(mdls,index);
@@ -73,15 +72,10 @@ void sptm::update(){
     auto st = std::get<0>(input);
     auto number_iterations = std::get<1>(input);
     std::vector<unsigned int> k= std::get<2>(input);
-    for(auto &x:k){
-        std::cout << x <<"\t";
-    }
-    std::cout << std::endl;
     auto alpha = std::get<3>(input); 
     // auto sd = std::get<4>(input);
 
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(k, st.get_alphabet(), alpha);
-
     TuringMachine tm(st);
     TapeMoves tpMove;
     for (auto i = 0u; i < number_iterations; ++i){

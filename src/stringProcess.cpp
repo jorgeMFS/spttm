@@ -128,7 +128,6 @@ std::vector<double> StringProcess::readinput_multimarkovmodel(std::vector<Markov
     nrc_values.push_back(value/this->normalizer);
     markovTable.reset();
   }
-  std::cout<<nrc_values.size()<<std::endl;
   return nrc_values;
 
 }
