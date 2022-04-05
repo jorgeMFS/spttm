@@ -10,10 +10,10 @@
 #include <cstring>
 #include <iostream>
 #include <iomanip>      // std::setw
-
+#include <cassert>
 #include "util.h"
 #include "parseArgs.h"
-
+#define assertm(exp, msg) assert(((void)msg, exp))
 
 Args parseArgs (int argc, char **argv){
     Args argument {};    
@@ -259,6 +259,7 @@ Args parseArgs (int argc, char **argv){
             exit(0);
         }
     }
+    assertm(((argument.tape_iterations % argument.num_out_lines)==0), "num_out_lines must be mod of tape_iterations");
     return argument;
 }
 

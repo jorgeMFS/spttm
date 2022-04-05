@@ -18,7 +18,7 @@
 
 
 sptm::sptm(Args args):str(args.input_file,args.alphabet_size){
-    num_it = args.tape_iterations / args.num_out_lines;
+    num_it = static_cast<double>(args.tape_iterations) / static_cast<double>(args.num_out_lines);
     StateMatrix st(args.states, args.alphabet_size);
     std::minstd_rand rng{args.sd};
     input_amplitude = str.get_input_vector().size();
