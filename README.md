@@ -17,11 +17,12 @@ Flags to run code:
 -A: alpha of markov model
 -f: file
 -e: seed
+-o: number of output lines per run
 ```
   
 Example of runing code:
 ```
-./sptm   -e 555 -s 2 -a 2 -i 100 -A 20 -k 2 -f "A"
+./sptm   -e 555 -s 2 -a 2 -i 100 -A 20 -k 2 -f "A" -o 20
 ```
 
 Input to program while running code:
