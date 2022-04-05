@@ -1,12 +1,11 @@
 #include "sptm.h"
 #include "interactiveMarkovModel.h"
 
-int main (int argc, char **argv){
+int main (){
     auto input=read_file();
     auto st = std::get<0>(input);
     auto number_iterations = std::get<1>(input);
     auto k = std::get<2>(input);
-    auto alpha = std::get<3>(input); 
 
     TuringMachine tm(st);
     TapeMoves tpMove;

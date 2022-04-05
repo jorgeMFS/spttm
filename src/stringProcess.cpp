@@ -93,7 +93,6 @@ void StringProcess::normalization_base(){
 
 
 std::vector<double> StringProcess::readinput(MarkovTable& markovTable) const {
-
   std::vector<double> nrc_values;
   for (auto vec: this->transcribed_vectors){
     double value = 0;
@@ -101,8 +100,9 @@ std::vector<double> StringProcess::readinput(MarkovTable& markovTable) const {
       value += markovTable.probability(&*it);
     }
     nrc_values.push_back(value/this->normalizer);
-    markovTable.reset();
   }
+
+  markovTable.reset();
   return nrc_values;
 }
 

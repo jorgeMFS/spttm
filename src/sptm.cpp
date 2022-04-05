@@ -15,7 +15,7 @@
 #include <sstream>
 #include <utility>
 #include <vector>
-
+#include <cassert>
 
 sptm::sptm(Args args):str(args.input_file,args.alphabet_size){
     num_it = static_cast<double>(args.tape_iterations) / static_cast<double>(args.num_out_lines);
@@ -30,11 +30,13 @@ sptm::sptm(Args args):str(args.input_file,args.alphabet_size){
     for (auto i = 0u; i < args.tape_iterations; ++i){
         tpMove = tm.act(); // grave esti antaŭe
         model.update_table(tpMove, tm.turingTape);
-        all_models.update_table(tpMove, tm.turingTape);
+        all_models.update_tables(tpMove, tm.turingTape);
+
         if(i%num_it==0){
-            auto written_tape = tm.get_tape().get_tape_vector(0);
             auto mdl = model.get_markov_table();
+            
             auto mdls = all_models.get_markov_tables();
+            auto written_tape = tm.get_tape().get_tape_vector(0);
             auto tape_length = tm.get_tape_size();
             auto diff = get_diff_amplitudes(tape_length);    
             auto nrc_vector = this->str.readinput(mdl);
@@ -44,7 +46,7 @@ sptm::sptm(Args args):str(args.input_file,args.alphabet_size){
             auto per_elem_tm = percentage_elements(written_tape, str.cardinality());
             auto elem_dist_diff = perc_diff_elems(per_elem_input,per_elem_tm);
             auto ht_dst = hit_score_and_dist(str.get_transcribed_vector(index), written_tape);
-            for(auto &x:nrc_values){
+            for(auto &x:nrc_values){// (auto &x:nrc_values)
                 std::cout << x << "\t";
             }
             std::cout << diff << "\t" << ht_dst.first << "\t" << ht_dst.second << "\t";
@@ -72,13 +74,13 @@ void sptm::update(){
     auto number_iterations = std::get<1>(input);
     std::vector<unsigned int> k= std::get<2>(input);
     auto alpha = std::get<3>(input); 
-
+    assert(((number_iterations % num_it)==0) && "num_out_lines must be mod of tape_iterations");
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(k, st.get_alphabet(), alpha);
     TuringMachine tm(st);
     TapeMoves tpMove;
     for (auto i = 0u; i < number_iterations; ++i){
         tpMove = tm.act(); // grave esti antaŭe
-        all_models.update_table(tpMove, tm.turingTape);
+        all_models.update_tables(tpMove, tm.turingTape);
         if (i%num_it==0){
             auto written_tape = tm.get_tape().get_tape_vector(0);
             auto tape_length = tm.get_tape_size();

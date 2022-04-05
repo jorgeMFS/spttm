@@ -79,57 +79,53 @@ struct AllInteractiveMarkovModel{
         }
     }   
     
-    void set_markov_table(MarkovTable mkvtab, unsigned int index){
+    void set_markov_tables(MarkovTable mkvtab, unsigned int index){
         this->InteractiveMarkovModels[index].set_markov_table(mkvtab);
     }
 
-    MarkovTable get_markov_table(unsigned int index) const {
+    MarkovTable get_markov_tables(unsigned int index) const {
         return this->InteractiveMarkovModels[index].get_markov_table();
     }
 
-    std::vector<unsigned int> get_markov_table_vector(unsigned int index) const{
+    std::vector<unsigned int> get_markov_table_vectors(unsigned int index) const{
         return this->InteractiveMarkovModels[index].get_markov_table_vector();
     }
 
     std::vector<MarkovTable> get_markov_tables() const{
        std::vector<MarkovTable>  markov_models;
-        for (auto it_mk_mdl:InteractiveMarkovModels){
-            markov_models.push_back(it_mk_mdl.get_markov_table());
+        for(auto i=0u;i<InteractiveMarkovModels.size();++i){
+             markov_models.push_back(InteractiveMarkovModels[i].get_markov_table());
         }
         return markov_models;
     }
 
-    unsigned int obtain_sum_occurrences_markov_table(unsigned int index) const{
+    unsigned int obtain_sum_occurrences_markov_tables(unsigned int index) const{
         return this->InteractiveMarkovModels[index].obtain_sum_occurrences_markov_table();
     }
 
-    void fill(unsigned int index, const Tape &tape){
+    void fills(unsigned int index, const Tape &tape){
         this->InteractiveMarkovModels[index].fill(tape);
     }
     
-    void fill(const Tape &tape){
-        for (auto it_mk_mdl:InteractiveMarkovModels){
-            it_mk_mdl.fill(tape);
+    void fills(const Tape &tape){
+         for(auto i=0u;i<InteractiveMarkovModels.size();++i){
+            InteractiveMarkovModels[i].fill(tape);
         }
     }
 
-    void add_other_tape(unsigned int index, const Tape& tape){
+    void add_other_tapes(unsigned int index, const Tape& tape){
         this->InteractiveMarkovModels[index].add_other_tape(tape);    
     }
 
-    void add_other_tape(const Tape& tape){
-        for (auto it_mk_mdl:InteractiveMarkovModels){
-            it_mk_mdl.add_other_tape(tape);    
+    void add_other_tapes(const Tape& tape){
+        for(auto i=0u;i<InteractiveMarkovModels.size();++i){
+         InteractiveMarkovModels[i].add_other_tape(tape);  
         }
     }
 
-    void update_table(unsigned int index, TapeMoves tpMv, Tape &tape){
-        this->InteractiveMarkovModels[index].update_table(tpMv,tape);
-    }
-
-    void update_table(TapeMoves tpMv, Tape &tape){
-        for (auto it_mk_mdl:InteractiveMarkovModels){
-            it_mk_mdl.update_table(tpMv,tape);
+    void update_tables(TapeMoves tpMv, Tape &tape){
+        for(auto i=0u;i<InteractiveMarkovModels.size();++i){
+            InteractiveMarkovModels[i].update_table(tpMv,tape);
         }
     }
 

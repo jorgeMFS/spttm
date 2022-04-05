@@ -55,7 +55,7 @@ void InteractiveMarkovModel::update_table(TapeMoves tpMv, Tape &tape){
     if ((diff_indexes) <= 3) {
         this->isFilled=false;}
   
-    if( (diff_indexes > 10) && (diff_indexes > (this->mrkvTable.k +2)  )  ){
+    if( (diff_indexes > 2) && (diff_indexes > (this->mrkvTable.k +2)  )  ){
 
         if (!this->isFilled ) {
             fill(tape);
@@ -66,6 +66,7 @@ void InteractiveMarkovModel::update_table(TapeMoves tpMv, Tape &tape){
             it_update_table(tpMv,tape);
         }
     }
+    // mrkvTable.print();
 }
 
 void InteractiveMarkovModel::it_update_table(TapeMoves tpMv, Tape &tape) {

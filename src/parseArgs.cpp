@@ -231,27 +231,6 @@ Args parseArgs (int argc, char **argv){
         putchar ('\n');
     }
 
-    // if (argument.k.size()>1){
-    //     std::cerr << bold_on << cyan_on <<"states = " << bold_off;
-    //     std::cerr << bold_on << argument.states << bold_off;
-    //     std::cerr << bold_on << cyan_on << ", alphabet_size = " << bold_off;
-    //     std::cerr << bold_on << argument.alphabet_size << bold_off;
-    //     std::cerr << bold_on << cyan_on << ", number of iterations = " << bold_off;
-    //     std::cerr << bold_on << argument.tape_iterations << bold_off; 
-    //     std::cerr << bold_on << cyan_on << ",  k = " << bold_off; 
-    //     std::cerr << bold_on << ":" << argument.k.back() << bold_off << std:: endl;
-    // }
-    // else if (argument.k.size()==1){
-    //    std::cerr << bold_on << cyan_on <<"states = " << bold_off;
-    //     std::cerr << bold_on << argument.states << bold_off;
-    //     std::cerr << bold_on << cyan_on << ", alphabet_size = " << bold_off;
-    //     std::cerr << bold_on << argument.alphabet_size << bold_off;
-    //     std::cerr << bold_on << cyan_on << ", number of iterations = " << bold_off;
-    //     std::cerr << bold_on << argument.tape_iterations << bold_off; 
-    //     std::cerr << bold_on << cyan_on << ",  k = " << bold_off; 
-    //     std::cerr << bold_on << argument.k.front() << bold_off << std:: endl;
-    // }
-
     for (auto kval: argument.k){
         if(ipow<TmId>(argument.alphabet_size, kval) >= ipow<TmId>(2,28)){
             fprintf (stderr, "k/context (%u) and Alphabet size/a (%zu) is too large..\n", kval, argument.alphabet_size);
