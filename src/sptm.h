@@ -20,6 +20,7 @@ struct sptm{
     
     StringProcess str;
     unsigned int index;
+    unsigned int num_it;
     unsigned int input_amplitude;
     std::vector<double> per_elem_input;
     sptm(Args args);

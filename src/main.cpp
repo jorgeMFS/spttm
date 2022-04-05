@@ -24,7 +24,6 @@
 int main (int argc, char **argv){
 
   Args argument = parseArgs(argc,argv);
-  // printArgs(argument);
   sptm sptm(argument);
   sptm.update();
   

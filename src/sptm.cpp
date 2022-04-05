@@ -18,7 +18,7 @@
 
 
 sptm::sptm(Args args):str(args.input_file,args.alphabet_size){
-    
+    num_it = args.tape_iterations / args.num_out_lines;
     StateMatrix st(args.states, args.alphabet_size);
     std::minstd_rand rng{args.sd};
     input_amplitude = str.get_input_vector().size();
@@ -26,13 +26,12 @@ sptm::sptm(Args args):str(args.input_file,args.alphabet_size){
     TuringMachine tm(st);
     InteractiveMarkovModel model(args.k[0], args.alphabet_size, args.alpha);
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
-
     TapeMoves tpMove;
     for (auto i = 0u; i < args.tape_iterations; ++i){
         tpMove = tm.act(); // grave esti antaŭe
         model.update_table(tpMove, tm.turingTape);
         all_models.update_table(tpMove, tm.turingTape);
-        if(i%10==0){
+        if(i%num_it==0){
             auto written_tape = tm.get_tape().get_tape_vector(0);
             auto mdl = model.get_markov_table();
             auto mdls = all_models.get_markov_tables();
@@ -73,7 +72,6 @@ void sptm::update(){
     auto number_iterations = std::get<1>(input);
     std::vector<unsigned int> k= std::get<2>(input);
     auto alpha = std::get<3>(input); 
-    // auto sd = std::get<4>(input);
 
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(k, st.get_alphabet(), alpha);
     TuringMachine tm(st);
@@ -81,7 +79,7 @@ void sptm::update(){
     for (auto i = 0u; i < number_iterations; ++i){
         tpMove = tm.act(); // grave esti antaŭe
         all_models.update_table(tpMove, tm.turingTape);
-        if (i%10==0){
+        if (i%num_it==0){
             auto written_tape = tm.get_tape().get_tape_vector(0);
             auto tape_length = tm.get_tape_size();
             auto diff = get_diff_amplitudes(tape_length);

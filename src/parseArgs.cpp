@@ -32,12 +32,13 @@ Args parseArgs (int argc, char **argv){
             {"context", required_argument, 0, 'k'},
             {"seed",optional_argument,0,'e'},
             {"alpha", required_argument, 0 , 'A'},
+            {"number_output_lines", required_argument, 0, 'o'},
             {"input_file", required_argument, 0 ,'f'},
             {NULL, 0, NULL, 0}
         };
         int option_index = 0;
 
-        int c = getopt_long (argc, argv, "e:s:a:A:i:k:f:h",
+        int c = getopt_long (argc, argv, "e:s:a:A:i:o:k:f:h",
                         long_options, &option_index);
 
         if (c == -1)
@@ -131,6 +132,20 @@ Args parseArgs (int argc, char **argv){
                 exit(0);
             }
             else argument.tape_iterations = correctInput;
+            break;
+        }
+        case 'o':
+            {
+            correctInput = strtol(optarg, &end, 10);
+            if (*end != '\0') {
+                std::cerr << "Invalid input for -o/--number_output_lines.\n";
+                exit(0);
+            }
+            else if (correctInput<=0){
+                std::cerr << "-o/--number_output_lines value was set to " << correctInput <<", must be an int larger than 0.\n";
+                exit(0);
+            }
+            else argument.num_out_lines = correctInput;
             break;
         }
 
@@ -261,9 +276,8 @@ void printArgs(Args arguments){
     else if (arguments.k.size()==1){
         std::cout<<"k = " << arguments.k.front() << std::endl;
     }
-    std::cout<<"alpha = " << arguments.alpha << std::endl;
-    std::cout<<"Number of TM iterations = " << arguments.n << std::endl;
-    std::cout<<"cash leaky-list size = " << arguments.n << std::endl;
+    std::cout<<"Alpha = " << arguments.alpha << std::endl;
+    std::cout<<"Number of output lines = " << arguments.num_out_lines << std::endl;
 }
 
 void help(){
