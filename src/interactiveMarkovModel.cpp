@@ -49,7 +49,7 @@ void InteractiveMarkovModel::add_other_tape(const Tape& tape){
     }
 }
 
-void InteractiveMarkovModel::update_table(TapeMoves tpMv, Tape &tape){
+void InteractiveMarkovModel::update_table(TapeMoves tpMv, Tape tape){
  
      auto diff_indexes = tape.ind_right - tape.ind_left;
     if ((diff_indexes) <= 3) {
@@ -66,7 +66,6 @@ void InteractiveMarkovModel::update_table(TapeMoves tpMv, Tape &tape){
             it_update_table(tpMv,tape);
         }
     }
-    // mrkvTable.print();
 }
 
 void InteractiveMarkovModel::it_update_table(TapeMoves tpMv, Tape &tape) {

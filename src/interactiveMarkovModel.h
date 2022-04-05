@@ -6,7 +6,7 @@
     @version 0.1
 */
 #pragma once
-
+#include <algorithm>
 #include "markovTable.h"
 
 /**
@@ -41,7 +41,7 @@ struct InteractiveMarkovModel{
      * @param previous_value . int of the previous value on the tape.
      * @param tape. Tape object of the Turing Machine.
      */
-    void update_table(TapeMoves tpMv, Tape &tape);
+    void update_table(TapeMoves tpMv, Tape tape);
      /**
      * Uses previous table and updates it using new tape.
      * @param tape. Tape object of the Turing Machine.
@@ -123,10 +123,14 @@ struct AllInteractiveMarkovModel{
         }
     }
 
-    void update_tables(TapeMoves tpMv, Tape &tape){
-        for(auto i=0u;i<InteractiveMarkovModels.size();++i){
-            InteractiveMarkovModels[i].update_table(tpMv,tape);
-        }
+    void update_tables(TapeMoves tpMv, Tape tape){
+    
+        auto update = [ tpMv, tape ](InteractiveMarkovModel & n) { n.update_table(tpMv, tape); };
+        std::for_each(std::begin(InteractiveMarkovModels), std::end(InteractiveMarkovModels),update);
+        // for(auto i=0u;i<InteractiveMarkovModels.size();++i){
+        //     InteractiveMarkovModels[i].update_table(tpMv,tape);
+        // }
     }
 
+    
 };
