@@ -25,6 +25,7 @@ struct Args{
     unsigned int c = 0;
     std::string input_file ="";
     unsigned int num_out_lines=0;
+    double threshold;
 };
 
 void help();

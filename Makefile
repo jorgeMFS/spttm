@@ -26,6 +26,12 @@ objects2 = src/tmId.o \
 		  src/read_input.o \
  		  src/main2.o 
 
+objects3 = src/tmId.o \
+		  src/markovTable.o \
+		  src/util.o \
+		  src/parseArgs.o \
+ 		  src/main3.o 
+
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
@@ -35,19 +41,24 @@ sptm: $(objects)
 run: $(objects2)
 	$(CXX) $(LFLAGS) $^ -o $@
 
+complextm: $(objects3)
+	$(CXX) $(LFLAGS) $^ -o $@
 
 all: sptm \
-	run
+	 run \
+	 complextm
 
 clean:
 	rm -f src/*.o sptm
 	rm -f src/*.o run
-
+	rm -f src/*.o complextm
 
 # Dependencies
 main.o: src/main.cpp src/parseArgs.h src/stringProcess.h
 
 main2.o: src/main2.cpp src/interactiveMarkovModel.h
+
+main3.o: src/main3.cpp src/parseArgs.h
 
 src/tmId.o: src/tmId.cpp src/tmId.h 
 

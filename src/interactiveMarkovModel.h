@@ -123,14 +123,8 @@ struct AllInteractiveMarkovModel{
         }
     }
 
-    void update_tables(TapeMoves tpMv, Tape tape){
-    
+    void update_tables(TapeMoves tpMv, Tape tape){ 
         auto update = [ tpMv, tape ](InteractiveMarkovModel & n) { n.update_table(tpMv, tape); };
         std::for_each(std::begin(InteractiveMarkovModels), std::end(InteractiveMarkovModels),update);
-        // for(auto i=0u;i<InteractiveMarkovModels.size();++i){
-        //     InteractiveMarkovModels[i].update_table(tpMv,tape);
-        // }
     }
-
-    
 };
