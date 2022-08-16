@@ -78,7 +78,7 @@ struct StateMatrix{
   std::vector<TuringRecord> get_state_matrix() const;
   unsigned int get_state_matrix_size() const;
   std::vector<Char> get_state_matrix_alphabet() const;
-
+  
   /// Reset the state matrix into a uniformly random position.
   template<typename R>
   void set_random(R& rng) {
@@ -98,6 +98,7 @@ struct StateMatrix{
   bool next();
   void print() const;
   void print_st_matrix_vector() const;
+  std::string print_st_matrix_vector();
   const TuringRecord* chr_line(Char c) const;
 
 };
@@ -143,7 +144,7 @@ struct TuringMachine {
 
   TuringMachine(unsigned int number_of_states, unsigned int alphabet_size);
   TuringMachine(const StateMatrix& ruleMatrix);
-
+  void set_tm(StateMatrix& ruleMatrix);
   Tape get_tape() const;
   unsigned int get_tape_size() const;
 
@@ -152,6 +153,7 @@ struct TuringMachine {
   StateMatrix get_tm_state_matrix() const;
   unsigned int get_alphabet_size() const;
   unsigned int get_number_of_states() const;
+  std::pair<TapeMoves,unsigned int> act_rule();
   bool test_full_alphabet_in_state_matrix(double percentage) const;
   std::string print_written_tape(bool print_to_console)const; 
   std::vector<Char> run_machine(unsigned int tape_it, unsigned int k);

@@ -298,6 +298,7 @@ TuringRecord& StateMatrix::at(Char alph, State state){
   return this->v.at(   (   (alph + 1) * this->nbStates   )   -   (   this->nbStates - state  )   );
 }
 
+
 const TuringRecord& StateMatrix::at(Char alph, State state) const {
   return this->v.at(   (   (alph + 1) * this->nbStates   )   -   (   this->nbStates - state  )   );
 }
@@ -367,6 +368,20 @@ void StateMatrix::print_st_matrix_vector() const{
     }
   }
   std::cout << std::endl;
+}
+std::string StateMatrix::print_st_matrix_vector(){
+std::string s = "";
+for (auto ii=0u;ii< this->alphSz ; ii++){
+    auto line = chr_line(ii);
+    for (auto jj=0u;jj< nbStates ; jj++){
+      auto& r = line[jj];
+      unsigned int write = r.write;
+      unsigned int move = r.move;
+      unsigned int state = r.state;
+      s += "(" + std::to_string(write) + ","  + std::to_string(move) + "," + std::to_string(state) + ")" + ";";
+    }
+  }
+  return s;
 }
 
 
@@ -532,7 +547,7 @@ std::unordered_map<unsigned int, double> Tape::get_tape_frequency(){
 
 std::string Tape::print_written_tape(bool print_to_console) const{
    if(print_to_console){
-     std::cerr << bold_on << underlined_on << green_on << "Written  Tape" << bold_off << std::endl << std::endl;
+     std::cerr << bold_on << underlined_on << green_on << "Written Tape" << bold_off << std::endl << std::endl;
      }
   std::string written_tape= "";
   for (auto j = this->tape.begin() + this->ind_left + 1; j != this->tape.begin() + this->ind_right; ++j){    
@@ -570,6 +585,11 @@ TuringMachine::TuringMachine(unsigned int number_of_states, unsigned int alphabe
 TuringMachine::TuringMachine(const StateMatrix& ruleMatrix):
   state(0), turingTape(), stMatrix(ruleMatrix){}
 
+void TuringMachine::set_tm(StateMatrix& ruleMatrix){
+  stMatrix = ruleMatrix;
+  reset_tape_and_state();
+}
+
 Tape TuringMachine::get_tape() const{
   return this->turingTape;
 }
@@ -590,6 +610,17 @@ TapeMoves TuringMachine::act(bool detectCycle){
   }
   this->state = tr.state;
   return tpMove;
+}
+
+std::pair<TapeMoves,unsigned int> TuringMachine::act_rule(){
+  TapeMoves tpMove;
+  Char alphValue = turingTape.getvalue();
+  auto tr = stMatrix.at(alphValue, this->state);
+  tpMove = turingTape.setandmove(tr.move, tr.write);
+  auto ruleIndex = stMatrix.get_index(alphValue, this->state);
+  this->state = tr.state;
+
+  return std::pair<TapeMoves,unsigned int>(tpMove,ruleIndex);
 }
 
 std::vector<Char> TuringMachine::run_machine(unsigned int tape_it, unsigned int k){
@@ -694,6 +725,7 @@ bool TMCycleDetector::cycledetector(TuringMachine &tm, unsigned int iterations){
     ++iter;
   }  
   detected = detector(appliedRules,pastTape, 16);
+  tm.reset_tape_and_state();
   // if (!detected){
   //   std::cout << "not detected"<<std::endl;
   //   printTapeRulesAndValues(appliedRules, pastTape);

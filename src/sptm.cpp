@@ -34,7 +34,6 @@ sptm::sptm(Args args):str(args.input_file,args.alphabet_size){
 
         if(i%num_it==0){
             auto mdl = model.get_markov_table();
-            
             auto mdls = all_models.get_markov_tables();
             auto written_tape = tm.get_tape().get_tape_vector(0);
             auto tape_length = tm.get_tape_size();

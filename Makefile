@@ -27,9 +27,13 @@ objects2 = src/tmId.o \
  		  src/main2.o 
 
 objects3 = src/tmId.o \
+		  src/turingMachine.o \
+ 		  src/stringProcess.o \
 		  src/markovTable.o \
 		  src/util.o \
 		  src/parseArgs.o \
+		  src/read_input.o \
+		  src/tprl.o \
  		  src/main3.o 
 
 %.o: %.cpp
@@ -41,17 +45,17 @@ sptm: $(objects)
 run: $(objects2)
 	$(CXX) $(LFLAGS) $^ -o $@
 
-complextm: $(objects3)
+tprl: $(objects3)
 	$(CXX) $(LFLAGS) $^ -o $@
 
 all: sptm \
 	 run \
-	 complextm
+	 tprl
 
 clean:
 	rm -f src/*.o sptm
 	rm -f src/*.o run
-	rm -f src/*.o complextm
+	rm -f src/*.o tprl
 
 # Dependencies
 main.o: src/main.cpp src/parseArgs.h src/stringProcess.h
@@ -75,5 +79,7 @@ src/markovTable.o: src/markovTable.cpp src/markovTable.h src/turingMachine.h src
 src/interactiveMarkovModel.o: src/interactiveMarkovModel.cpp src/interactiveMarkovModel.h src/markovTable.h
 
 src/sptm.o: src/sptm.cpp src/sptm.h 
+
+src/tprl.o: src/tprl.cpp src/tprl.h
 
 src/read_input.o: src/read_input.cpp src/read_input.h 

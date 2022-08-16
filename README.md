@@ -20,7 +20,7 @@ Flags to run code:
 -o: number of output lines per run
 ```
   
-Example of runing code:
+Example of runing sptm:
 ```
 ./sptm   -e 555 -s 2 -a 2 -i 100 -A 20 -k 2 -f "A" -o 20
 ```
@@ -55,6 +55,14 @@ E.g.
 ```
 1.88525 0.419048        0.639344        3.48925e+10     0.362538        0.0680838
 ```
+
+Example of runing tprl:
+```
+./tprl   -e 555 -s 2 -a 2 -i 100 -A 20 -k 2 -f "A" -o 20
+```
+
+Outputs: files in dataset folder
+
 
 ## ISSUES
 Please let us know if there is any
