@@ -15,10 +15,10 @@
 
 tprl::tprl(Args args):counter(0),st(args.states, args.alphabet_size),rng{args.sd}{
     std::ofstream outFile(args.input_file+"_"+std::to_string(counter));
+    auto i = 0;
     num_it = static_cast<double>(args.tape_iterations) / static_cast<double>(args.num_out_lines);
-    while(true){
+    while (i++ < 10){
         step(args);
-        exit(44);
     }
 }
 
