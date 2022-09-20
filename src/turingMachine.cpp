@@ -428,7 +428,7 @@ std::vector<StateMatrix> generate_sucessors(StateMatrix st){
 
 
 Tape::Tape():
-  tape(256, 0), position(128), max_size(256),ind_left(position-1),ind_right(position+1){}
+  tape(256, 0), position(128), max_size(256),ind_left(position-1),ind_right(position+1),ind_more_left(128){}
 
 Char Tape::getvalue() {
   return this->tape[this->position];
@@ -439,7 +439,7 @@ size_t Tape::getposition() const {
 }
 
 size_t Tape::get_index() const {
-  return this->position-128;
+  return this->position-this->ind_more_left;
 }
 
 /**
@@ -466,6 +466,11 @@ TapeMoves Tape::setandmove(Move relativePos, Char value) {
   tapeMove.previousPosition = this->position;
   this->position += replace_pos;
   
+  if(this->position<this->ind_more_left){
+    this->ind_more_left=this->position;
+  }
+
+
   if (this->position >= this->ind_right){
       this->ind_right = this->position+1;
       tapeMove.moveRight = true;
@@ -493,6 +498,7 @@ void Tape::resetTape() {
   this->position = this->tape.size() / 2;
   this->ind_left = this->position-1;
   this->ind_right = this->position+1;
+  this->ind_more_left = this->position;
 }
 
 void Tape::reserve_right(size_t amount) {
@@ -595,10 +601,6 @@ void TuringMachine::set_tm(StateMatrix& ruleMatrix){
   reset_tape_and_state();
 }
 
-size_t TuringMachine::get_index() const{
-  return this->turingTape.get_index();
-}
-
 Tape TuringMachine::get_tape() const{
   return this->turingTape;
 }
@@ -621,7 +623,7 @@ TapeMoves TuringMachine::act(bool detectCycle){
   return tpMove;
 }
 
-std::pair<TapeMoves,unsigned int> TuringMachine::act_rule(){
+std::tuple<TapeMoves,unsigned int,size_t> TuringMachine::act_rule(){
   TapeMoves tpMove;
   Char alphValue = turingTape.getvalue();
   auto tr = stMatrix.at(alphValue, this->state);
@@ -629,7 +631,7 @@ std::pair<TapeMoves,unsigned int> TuringMachine::act_rule(){
   auto ruleIndex = stMatrix.get_index(alphValue, this->state);
   this->state = tr.state;
 
-  return std::pair<TapeMoves,unsigned int>(tpMove,ruleIndex);
+  return {tpMove,ruleIndex,turingTape.get_index()};
 }
 
 std::vector<Char> TuringMachine::run_machine(unsigned int tape_it, unsigned int k){
