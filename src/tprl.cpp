@@ -28,6 +28,7 @@ void tprl::step(Args args){
     
     TapeMoves tpMove;
     std::vector<unsigned int> recordM;
+    std::vector<size_t> index_list;
     std::vector<std::vector<Char>> tapes;
     st.set_random(rng);
     TuringMachine tm(st);
@@ -49,6 +50,7 @@ void tprl::step(Args args){
         tpMove = pair_tp_rule.first;
         recordM.push_back(pair_tp_rule.second);
         tapes.push_back(tm.get_tape().get_tape_vector(0));
+        index_list.push_back(tm.get_index());
     }
 
     auto st_m  = st.print_st_matrix_vector();
@@ -63,5 +65,10 @@ void tprl::step(Args args){
             outFile  << el;
         }
         outFile  << ";";
+    }
+    outFile  << std::endl;
+    outFile  << 0 << ",";
+    for(const auto &i : index_list){
+            outFile  << i << ",";
     }
 }

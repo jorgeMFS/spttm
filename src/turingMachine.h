@@ -121,7 +121,8 @@ struct Tape {
   unsigned int get_size() const;
   public:
     Char getvalue();
-    size_t getposition();
+    size_t getposition() const;
+    size_t get_index() const;
     std::vector<Char>get_tape_vector(unsigned int context_k);
     std::unordered_map<unsigned int, double> get_tape_frequency();
 
@@ -147,6 +148,7 @@ struct TuringMachine {
   void set_tm(StateMatrix& ruleMatrix);
   Tape get_tape() const;
   unsigned int get_tape_size() const;
+  size_t get_index() const;
 
   void reset_tape_and_state();
   TapeMoves act(bool detectCycle=false);
