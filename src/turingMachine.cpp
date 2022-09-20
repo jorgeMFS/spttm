@@ -6,6 +6,7 @@
     @version 0.1
 */
 
+#include <cstddef>
 #include <memory>
 #include <sstream>
 #include <cassert>
@@ -433,8 +434,12 @@ Char Tape::getvalue() {
   return this->tape[this->position];
 }
 
-size_t Tape::getposition() {
+size_t Tape::getposition() const {
   return this->position;
+}
+
+size_t Tape::get_index() const {
+  return this->position-128;
 }
 
 /**
@@ -588,6 +593,10 @@ TuringMachine::TuringMachine(const StateMatrix& ruleMatrix):
 void TuringMachine::set_tm(StateMatrix& ruleMatrix){
   stMatrix = ruleMatrix;
   reset_tape_and_state();
+}
+
+size_t TuringMachine::get_index() const{
+  return this->turingTape.get_index();
 }
 
 Tape TuringMachine::get_tape() const{
