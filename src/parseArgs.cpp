@@ -35,11 +35,12 @@ Args parseArgs (int argc, char **argv){
             {"number_output_lines", required_argument, 0, 'o'},
             {"threshold", optional_argument, 0, 'T'},
             {"input_file", required_argument, 0 ,'f'},
+            {"number_files", optional_argument, 0 ,'N'},
             {NULL, 0, NULL, 0}
         };
         int option_index = 0;
 
-        int c = getopt_long (argc, argv, "e:s:a:A:i:o:T:k:f:h",
+        int c = getopt_long (argc, argv, "e:s:a:A:i:o:T:k:f:N:h",
                         long_options, &option_index);
 
         if (c == -1)
@@ -133,6 +134,20 @@ Args parseArgs (int argc, char **argv){
                 exit(0);
             }
             else argument.tape_iterations = correctInput;
+            break;
+        }
+        case 'N':
+            {
+            correctInput = strtol(optarg, &end, 10);
+            if (*end != '\0') {
+                std::cerr << "Invalid input for -N/--n_files.\n";
+                exit(0);
+            }
+            else if (correctInput<=0){
+                std::cerr << "-N/--n_files value was set to " << correctInput <<", must be an int larger than 0.\n";
+                exit(0);
+            }
+            else argument.n_files = correctInput;
             break;
         }
         case 'o':
@@ -269,6 +284,7 @@ void printArgs(Args arguments){
     std::cout<<"alphabet size = " << arguments.alphabet_size<< std::endl;
     std::cout<<"tape_iterations = " << arguments.tape_iterations << std::endl;
     std::cout<< "input file : " << arguments.input_file << std::endl;
+    std::cout<< "number of files : " << arguments.n_files << std::endl;
     std::cout<< "Threshold : " << arguments.threshold << std::endl;
     if (arguments.k.size()>1){
         std::cout<<"k = " << arguments.k.front()<<  ":" << arguments.k.back() << std::endl;
