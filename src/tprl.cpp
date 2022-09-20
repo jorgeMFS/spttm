@@ -46,11 +46,11 @@ void tprl::step(Args args){
     
     //get NRC or cycle.
     for (auto i = 0u; i < args.tape_iterations; ++i){
-        auto pair_tp_rule = tm.act_rule(); // grave esti antaŭe
-        tpMove = pair_tp_rule.first;
-        recordM.push_back(pair_tp_rule.second);
+        auto tuple_tp_rule = tm.act_rule(); // grave esti antaŭe
+        tpMove = std::get<0>(tuple_tp_rule);
+        recordM.push_back(std::get<1>(tuple_tp_rule));
         tapes.push_back(tm.get_tape().get_tape_vector(0));
-        index_list.push_back(tm.get_index());
+        index_list.push_back(std::get<2>(tuple_tp_rule));
     }
 
     auto st_m  = st.print_st_matrix_vector();
@@ -67,7 +67,6 @@ void tprl::step(Args args){
         outFile  << ";";
     }
     outFile  << std::endl;
-    outFile  << 0 << ",";
     for(const auto &i : index_list){
             outFile  << i << ",";
     }

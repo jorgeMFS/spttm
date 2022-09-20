@@ -116,6 +116,7 @@ struct Tape {
   size_t max_size;
   size_t ind_left;
   size_t ind_right;
+  size_t ind_more_left;
 
   Tape();
   unsigned int get_size() const;
@@ -148,14 +149,13 @@ struct TuringMachine {
   void set_tm(StateMatrix& ruleMatrix);
   Tape get_tape() const;
   unsigned int get_tape_size() const;
-  size_t get_index() const;
 
   void reset_tape_and_state();
   TapeMoves act(bool detectCycle=false);
   StateMatrix get_tm_state_matrix() const;
   unsigned int get_alphabet_size() const;
   unsigned int get_number_of_states() const;
-  std::pair<TapeMoves,unsigned int> act_rule();
+  std::tuple<TapeMoves,unsigned int,size_t> act_rule();
   bool test_full_alphabet_in_state_matrix(double percentage) const;
   std::string print_written_tape(bool print_to_console)const; 
   std::vector<Char> run_machine(unsigned int tape_it, unsigned int k);
