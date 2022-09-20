@@ -15,9 +15,9 @@
 
 tprl::tprl(Args args):counter(0),st(args.states, args.alphabet_size),rng{args.sd}{
     std::ofstream outFile(args.input_file+"_"+std::to_string(counter));
-    auto i = 0;
+    auto i = 0u;
     num_it = static_cast<double>(args.tape_iterations) / static_cast<double>(args.num_out_lines);
-    while (i++ < 10){
+    while (i++ < args.n_files){
         step(args);
     }
 }

@@ -18,6 +18,7 @@ Flags to run code:
 -f: file
 -e: seed
 -o: number of output lines per run
+-N: number of files
 ```
   
 Example of runing sptm:
@@ -58,7 +59,7 @@ E.g.
 
 Example of runing tprl:
 ```
-./tprl   -e 555 -s 2 -a 2 -i 100 -A 20 -k 2 -f "A" -o 20
+./tprl   -e 555 -s 2 -a 2 -i 100 -A 20 -k 2 -f "A" -o 20 -N 10000
 ```
 
 Outputs: files in dataset folder
