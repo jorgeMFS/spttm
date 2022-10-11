@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-CXX = g++ -std=c++14
+CXX = g++ -std=c++17
 CXXFLAGS = -Wall -Wextra -O3 -m64 -g -I./include
 LFLAGS = -pthread
 
@@ -44,6 +44,7 @@ objects4 = src/tmId.o \
 		  src/parseArgs.o \
 		  src/util.o \
 		  src/sptm.o \
+		  src/spark.o \
 		  src/read_input.o \
  		  src/main_search.o
 
@@ -99,6 +100,8 @@ src/markovTable.o: src/markovTable.cpp src/markovTable.h src/turingMachine.h src
 src/interactiveMarkovModel.o: src/interactiveMarkovModel.cpp src/interactiveMarkovModel.h src/markovTable.h
 
 src/sptm.o: src/sptm.cpp src/sptm.h 
+
+src/sptm.o: src/spark.cpp src/spark.h 
 
 src/tprl.o: src/tprl.cpp src/tprl.h
 
