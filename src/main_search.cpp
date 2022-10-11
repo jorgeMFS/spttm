@@ -22,11 +22,10 @@ int main (int argc, char **argv){
     printArgs(argument);
     auto strategy = argument.search_strategy;
     if (std::strcmp(strategy, "Null") == 0){
-        throw std::invalid_argument("search_strategy argument can not be null in this program ");
+        throw std::invalid_argument("search_strategy argument can not be null in this program");
     }
 
-  // 
-  // sptm sptm(argument);
-  // sptm.update();
+  // spark spark(argument);
+  // spark.update();
   
 }
