@@ -19,6 +19,8 @@ Flags to run code:
 -e: seed
 -o: number of output lines per run
 -N: number of files
+-T: nrc threshold
+-S: search mode (sequential, monte carlo and neural networks)
 ```
   
 Example of runing sptm:
@@ -63,6 +65,12 @@ Example of runing tprl:
 ```
 
 Outputs: files in dataset folder
+
+
+Example of runing spark:
+```
+./spark   -e 555 -s 2 -a 2 -i 100 -A 20 -k 2 -f "A" -o 20 -T 0.5 -S S
+```
 
 
 ## ISSUES
