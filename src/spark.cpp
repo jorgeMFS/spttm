@@ -37,14 +37,9 @@ void spark::init(Args args){
             auto diff = get_diff_amplitudes(tape_length);    
             auto nrc_vector = this->str.readinput(mdl);
             index = std::min_element(nrc_vector.begin(), nrc_vector.end()) - nrc_vector.begin();
-            auto nrc_values = this->str.readinput_multimarkovmodel(mdls,index);
-            
+            auto avg_nrc = this->str.get_average_nrc(mdls,index);
             std::cerr << "amplitude discrepancy => "<< diff << " units" << std::endl;
-
-            for(auto &x:nrc_values){// (auto &x:nrc_values)
-                std::cout << x << "\t";
-            }
-            std::cerr << "avg nrc: "<< this->str.get_average_nrc(mdls,index) << std::endl;
+            std::cerr << "avg nrc: "<< avg_nrc << std::endl;
             exit(1);
         }
     }
