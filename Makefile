@@ -36,6 +36,18 @@ objects3 = src/tmId.o \
 		  src/tprl.o \
  		  src/main3.o 
 
+objects4 = src/tmId.o \
+		  src/turingMachine.o \
+		  src/interactiveMarkovModel.o \
+		  src/stringProcess.o \
+		  src/markovTable.o \
+		  src/parseArgs.o \
+		  src/util.o \
+		  src/sptm.o \
+		  src/read_input.o \
+ 		  src/main_search.o
+
+
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
@@ -48,16 +60,24 @@ run: $(objects2)
 tprl: $(objects3)
 	$(CXX) $(LFLAGS) $^ -o $@
 
+spark: $(objects4)
+	$(CXX) $(LFLAGS) $^ -o $@
+
 all: sptm \
 	 run \
-	 tprl
+	 tprl \
+	 spark
 
 clean:
 	rm -f src/*.o sptm
 	rm -f src/*.o run
 	rm -f src/*.o tprl
+	rm -f src/*.o spark
 
 # Dependencies
+
+main_search.o: src/main_search.cpp src/parseArgs.h src/stringProcess.h
+
 main.o: src/main.cpp src/parseArgs.h src/stringProcess.h
 
 main2.o: src/main2.cpp src/interactiveMarkovModel.h
