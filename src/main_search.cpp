@@ -13,7 +13,7 @@
 
 #include <stdexcept>
 #include "parseArgs.h"
-
+#include "spark.h"
 
 int main (int argc, char **argv){
 
@@ -24,8 +24,7 @@ int main (int argc, char **argv){
     if (std::strcmp(strategy, "Null") == 0){
         throw std::invalid_argument("search_strategy argument can not be null in this program");
     }
-
-  // spark spark(argument);
+    spark spark(argument);
   // spark.update();
   
 }
