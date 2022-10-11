@@ -10,6 +10,7 @@
 #include <string>
 #include <valarray>
 #include <cassert>
+#include <numeric>
 
 #include "stringProcess.h"
 #include "turingMachine.h"
@@ -131,8 +132,10 @@ std::vector<double> StringProcess::readinput_multimarkovmodel(std::vector<Markov
   return nrc_values;
 
 }
-
-
+double StringProcess::get_average_nrc(std::vector<MarkovTable>& markovTableVector, unsigned int index) const {
+  auto v = readinput_multimarkovmodel(markovTableVector,index); 
+  return std::reduce(v.begin(), v.end()) / v.size();
+}
 double StringProcess::calculateLog(double index_value, double index_sum){
     auto value = index_value / index_sum;   
     return (- DEFAULT_LOG2_LUT.log2(value));
