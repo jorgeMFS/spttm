@@ -36,11 +36,12 @@ Args parseArgs (int argc, char **argv){
             {"threshold", optional_argument, 0, 'T'},
             {"input_file", required_argument, 0 ,'f'},
             {"number_files", optional_argument, 0 ,'N'},
+            {"strategy", optional_argument, 0, 'S'},
             {NULL, 0, NULL, 0}
         };
         int option_index = 0;
 
-        int c = getopt_long (argc, argv, "e:s:a:A:i:o:T:k:f:N:h",
+        int c = getopt_long (argc, argv, "e:s:a:A:i:o:T:k:f:N:S:h",
                         long_options, &option_index);
 
         if (c == -1)
@@ -249,6 +250,21 @@ Args parseArgs (int argc, char **argv){
             argument.input_file = optarg;
             break;
         }
+        case 'S':
+        {
+            if (std::strcmp(optarg, "S") == 0) {
+                argument.search_strategy = "Sequential";
+            } else if (std::strcmp(optarg, "M") == 0) {
+                argument.search_strategy = "monte_carlo";
+            } else if (std::strcmp(optarg, "N") == 0) {
+                argument.search_strategy = "neural_networks";
+            } else {
+                std::cerr << "-S/--strategy must be either `sequential` or `monte_carlo`." << std::endl;
+                exit(0);
+            }
+            break;
+        }
+
         case '?':
             break;
 
@@ -279,12 +295,12 @@ Args parseArgs (int argc, char **argv){
 
 
 void printArgs(Args arguments){
-    std::cout<< bold_on <<"seed = " << arguments.sd << bold_off << std::endl;
-    std::cout<<"states = " << arguments.states << std::endl;
-    std::cout<<"alphabet size = " << arguments.alphabet_size<< std::endl;
-    std::cout<<"tape_iterations = " << arguments.tape_iterations << std::endl;
-    std::cout<< "input file : " << arguments.input_file << std::endl;
-    std::cout<< "number of files : " << arguments.n_files << std::endl;
+    std::cout<< bold_on << "Seed = " << arguments.sd << bold_off << std::endl;
+    std::cout<< "States = " << arguments.states << std::endl;
+    std::cout<< "Alphabet Size = " << arguments.alphabet_size<< std::endl;
+    std::cout<< "Tape Iterations = " << arguments.tape_iterations << std::endl;
+    std::cout<< "Input file : " << arguments.input_file << std::endl;
+    std::cout<< "Number of files : " << arguments.n_files << std::endl;
     std::cout<< "Threshold : " << arguments.threshold << std::endl;
     if (arguments.k.size()>1){
         std::cout<<"k = " << arguments.k.front()<<  ":" << arguments.k.back() << std::endl;
@@ -292,8 +308,9 @@ void printArgs(Args arguments){
     else if (arguments.k.size()==1){
         std::cout<<"k = " << arguments.k.front() << std::endl;
     }
-    std::cout<<"Alpha = " << arguments.alpha << std::endl;
-    std::cout<<"Number of output lines = " << arguments.num_out_lines << std::endl;
+    std::cout<< "Alpha = " << arguments.alpha << std::endl;
+    std::cout<< "Number of output lines = " << arguments.num_out_lines << std::endl;
+    std::cout<< "Search Strategy = " << arguments.search_strategy << std::endl;
 }
 
 void help(){

@@ -26,7 +26,8 @@ struct Args{
     std::string input_file ="";
     unsigned int n_files=0;
     unsigned int num_out_lines=0;
-    double threshold;
+    double threshold=0.1;
+    const char * search_strategy = "Null";
 };
 
 void help();
