@@ -40,6 +40,7 @@ void spark::init(Args args){
             auto avg_nrc = this->str.get_average_nrc(mdls,index);
             std::cerr << "amplitude discrepancy => "<< diff << " units" << std::endl;
             std::cerr << "avg nrc: "<< avg_nrc << std::endl;
+            std::cerr << "results: "<< avg_nrc*diff << std::endl;
             exit(1);
         }
     }
@@ -47,14 +48,12 @@ void spark::init(Args args){
     std::cout << "@" <<std::endl;
 
     // while(true){
-    //     sptm::update();
+    //     spark::update();
     // }
 }
 
 
 
 double spark::get_diff_amplitudes(unsigned int & tape_length){
-    auto diff = std::abs(static_cast<double>(tape_length)-static_cast<double>(input_amplitude));
-    auto max = std::max(static_cast<double>(tape_length),static_cast<double>(input_amplitude));
-    return diff/max;
+    return std::abs(static_cast<double>(tape_length)-static_cast<double>(input_amplitude));
 }
