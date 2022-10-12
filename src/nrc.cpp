@@ -1,15 +1,3 @@
-/**
-    main_search.cpp
-    Purpose: Computes nrc using 2 input strings
-            1) Receives Alpha and k vector;
-            2) reads inputs;
-            3) Computes NRC;
-           
-    @author Jorge Miguel Ferreira da Silva
-    @version 0.1
-*/
-
-
 #include "nrc.h"
 #include "parseArgs.h"
 #include "read_input.h"
