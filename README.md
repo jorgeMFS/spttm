@@ -66,6 +66,11 @@ Example of runing tprl:
 
 Outputs: files in dataset folder
 
+Example of runing nrc:
+```
+./nrc -a 2  -A 1 -k 2:9 -f "tapes/A" -t "tapes/B"
+```
+
 
 Example of runing spark:
 ```
