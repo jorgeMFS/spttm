@@ -42,5 +42,11 @@ void ReadInput::printData() const {
 
 std::vector<char> ReadInput::get_input_vector() const{
     return vecOfchrs;
+}
 
+std::vector<unsigned int> ReadInput::get_input_vector_as_unsigned_int() const{
+    std::vector<unsigned int> v(vecOfchrs.begin(), vecOfchrs.end());    
+    for(auto& i : v)
+        i -= '0'; // make digits to numbers
+    return v;
 }

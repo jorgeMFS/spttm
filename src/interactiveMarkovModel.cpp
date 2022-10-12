@@ -40,6 +40,16 @@ void InteractiveMarkovModel::fill(const Tape &tape){
         this->mrkvTable.at(&*it) += 1;
     }
 }
+void InteractiveMarkovModel::fill_with_vector(const std::vector<unsigned int> &input_vector){
+
+    this->mrkvTable.reset(); // here is a reset to the mkvtable
+    auto b = begin(input_vector);    
+    auto e = end(input_vector) - this->mrkvTable.k; 
+    for (auto it = b; it != e; ++it) {
+        this->mrkvTable.at(&*it) += 1;
+    }
+}
+
 
 void InteractiveMarkovModel::add_other_tape(const Tape& tape){
     auto b = begin(tape.tape) + tape.ind_left + 1;    

@@ -8,4 +8,5 @@ struct ReadInput{
     void getFileContent(std::string fileName);
     void printData() const;
     std::vector<char> get_input_vector() const;
+    std::vector<unsigned int> get_input_vector_as_unsigned_int() const;
 };

@@ -25,6 +25,9 @@ struct InteractiveMarkovModel{
     /** Retrieve a copy of the inner Markov table */
     MarkovTable get_markov_table() const;
 
+    /** reads input vector and creates Markov Model*/
+    void  fill_with_vector(const std::vector<unsigned int> &input_vector);
+
     /**sets markovTable of Interactive Markov Model */
     void set_markov_table(MarkovTable mkvtab);
 
@@ -106,9 +109,14 @@ struct AllInteractiveMarkovModel{
     void fills(unsigned int index, const Tape &tape){
         this->InteractiveMarkovModels[index].fill(tape);
     }
-    
+    void  fill_with_vector(const std::vector<unsigned int> &input_vector){
+        for(auto i=0u;i<InteractiveMarkovModels.size();++i){
+            InteractiveMarkovModels[i].fill_with_vector(input_vector);
+        }
+
+    }
     void fills(const Tape &tape){
-         for(auto i=0u;i<InteractiveMarkovModels.size();++i){
+        for(auto i=0u;i<InteractiveMarkovModels.size();++i){
             InteractiveMarkovModels[i].fill(tape);
         }
     }

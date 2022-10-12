@@ -26,7 +26,7 @@ void spark::init(Args args){
     TapeMoves tpMove;
     for (auto i = 0u; i < args.tape_iterations; ++i){
         tpMove = tm.act(); // grave esti antaŭe
-        model.update_table(tpMove, tm.turingTape);
+        model.update_table(tpMove, tm.turingTape); 
         all_models.update_tables(tpMove, tm.turingTape);
 
         if(i%num_it==0){

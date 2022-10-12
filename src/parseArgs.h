@@ -24,6 +24,7 @@ struct Args{
     TmId n = 0;
     unsigned int c = 0;
     std::string input_file ="";
+    std::string target_file ="";
     unsigned int n_files=0;
     unsigned int num_out_lines=0;
     double threshold=0.1;

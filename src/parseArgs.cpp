@@ -26,22 +26,23 @@ Args parseArgs (int argc, char **argv){
         {
 
             {"help",      no_argument,      0, 'h'},
-            {"number_states", required_argument, 0 , 's'},
-            {"alphabet_size", required_argument, 0, 'a'},
-            {"iterations", required_argument, 0, 'i'},
+            {"number_states", optional_argument, 0 , 's'},
+            {"alphabet_size", optional_argument, 0, 'a'},
+            {"iterations", optional_argument, 0, 'i'},
             {"context", required_argument, 0, 'k'},
             {"seed",optional_argument,0,'e'},
             {"alpha", required_argument, 0 , 'A'},
-            {"number_output_lines", required_argument, 0, 'o'},
+            {"number_output_lines", optional_argument, 0, 'o'},
             {"threshold", optional_argument, 0, 'T'},
-            {"input_file", required_argument, 0 ,'f'},
+            {"input_file", optional_argument, 0 ,'f'},
+            {"target_file", optional_argument, 0 ,'t'},
             {"number_files", optional_argument, 0 ,'N'},
             {"strategy", optional_argument, 0, 'S'},
             {NULL, 0, NULL, 0}
         };
         int option_index = 0;
 
-        int c = getopt_long (argc, argv, "e:s:a:A:i:o:T:k:f:N:S:h",
+        int c = getopt_long (argc, argv, "e:s:a:A:i:o:T:k:f:t:N:S:h",
                         long_options, &option_index);
 
         if (c == -1)
@@ -245,9 +246,14 @@ Args parseArgs (int argc, char **argv){
         }
         
         case 'f':
-            {
+        {
             // std::string input_file = optarg;
             argument.input_file = optarg;
+            break;
+        }
+        case 't':
+        {
+            argument.target_file = optarg;
             break;
         }
         case 'S':
@@ -288,7 +294,9 @@ Args parseArgs (int argc, char **argv){
             exit(0);
         }
     }
-    assertm(((argument.tape_iterations % argument.num_out_lines)==0), "num_out_lines must be mod of tape_iterations");
+    if(argument.tape_iterations>0 & argument.num_out_lines>0){
+        assertm(((argument.tape_iterations % argument.num_out_lines)==0), "num_out_lines must be mod of tape_iterations");
+    }
     return argument;
 }
 
@@ -300,6 +308,7 @@ void printArgs(Args arguments){
     std::cout<< "Alphabet Size = " << arguments.alphabet_size<< std::endl;
     std::cout<< "Tape Iterations = " << arguments.tape_iterations << std::endl;
     std::cout<< "Input file : " << arguments.input_file << std::endl;
+    std::cout<< "Target file : " << arguments.target_file << std::endl;
     std::cout<< "Number of files : " << arguments.n_files << std::endl;
     std::cout<< "Threshold : " << arguments.threshold << std::endl;
     if (arguments.k.size()>1){
