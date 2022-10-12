@@ -9,4 +9,4 @@ int main (int argc, char **argv){
   Args argument = parseArgs(argc,argv);  
   printArgs(argument);
   tprl tprl(argument);
-  }
+}
