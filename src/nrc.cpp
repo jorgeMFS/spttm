@@ -30,6 +30,8 @@ void nrc::init(Args args){
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
 
     model.fill_with_vector(input_vector);
+    model.get_markov_table().print();
+    model.get_markov_table().normalize(0.0001);
     all_models.fill_with_vector(input_vector);
 
     auto mdl = model.get_markov_table();

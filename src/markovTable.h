@@ -40,6 +40,8 @@ struct MarkovTable{
    */
   MarkovTable(unsigned int k, unsigned int alphabet_size, double alpha);
   
+  std::vector<double> normalize(double lambda) const;
+
   /**
    * Accesses position on Markov Table, by providing a pointer to a position on array of TM characters.
    */

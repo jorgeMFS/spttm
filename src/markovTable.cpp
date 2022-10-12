@@ -21,6 +21,40 @@ MarkovTable::MarkovTable(unsigned int k, unsigned int alphabet_size, double alph
 unsigned int MarkovTable::get_context() const{
     return this->k;
 }
+std::vector<double> MarkovTable::normalize(double lambda) const {
+
+    std::vector<double> nMK(markovVector.size(),0);
+    // for each line, normalize by max value + alpha;
+    std::cout << std::endl;
+    unsigned int counter = 0;
+    std::vector<double> mrkvM;
+    std::vector<double> line;
+    double denominator=0.0;
+    for(auto&& x: this->markovVector){    
+        line.push_back(x+lambda);
+        denominator+=(x+lambda);
+
+        if(++counter == this->alphSz){
+            counter=0;
+            std::transform(line.begin(), line.end(), line.begin(), [denominator](double &c){ return c/denominator; });
+            mrkvM.insert(mrkvM.end(), line.begin(), line.end());
+            denominator=0;
+            line.clear();
+        }
+    }
+    
+    counter = 0;
+    for(auto&& x: mrkvM){  
+        std::cout << x << "\t";
+        
+        if(++counter == this->alphSz){
+            counter=0;
+            std::cout << std::endl;
+        }
+    }
+    return mrkvM;
+};
+
 
 std::vector<unsigned int> MarkovTable::get_vector() const{
     return this->markovVector;
@@ -123,6 +157,7 @@ void MarkovTable::print_all() const{
     for(auto letter=0u; letter<this->alphSz; ++letter){
         std::cout << bold_on  << green_on << "-------" << bold_off;
     }
+
     unsigned int cntr = 0;
     std::cout << std::endl << bold_on << green_on  << results[cntr] << " | " << bold_off << "\t";
 
