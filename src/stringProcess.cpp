@@ -16,6 +16,7 @@
 #include "turingMachine.h"
 #include "read_input.h"
 #include "util.h"
+#include "interactiveMarkovModel.h"
 
 //------------------------------------
 using std::valarray;
@@ -105,6 +106,27 @@ std::vector<double> StringProcess::readinput(MarkovTable& markovTable) const {
 
   markovTable.reset();
   return nrc_values;
+}
+
+std::vector<MarkovTable> StringProcess::get_models(Args &args,std::vector<unsigned int> &confirmation_vector, bool print_bool) const{
+  unsigned int index;
+  for (auto i=0u; i<transcribed_vectors.size(); ++i){
+    if(get_transcribed_vector(i) == confirmation_vector){
+        index=i;
+      }
+  }
+  
+
+  if(print_bool){
+    print_transcribed_vector(index);
+  }
+
+  AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, m_cardinality, args.alpha);
+  
+  all_models.fill_with_vector(get_transcribed_vector(index));
+
+  return all_models.get_markov_tables();
+
 }
 
 double StringProcess::readinput(MarkovTable& markovTable, unsigned int index) const {

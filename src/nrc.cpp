@@ -12,14 +12,11 @@ void nrc::init(Args args){
     ReadInput readtarget(args.target_file);
 
     auto input_vector = readinput.get_input_vector_as_unsigned_int();
-    auto target_vector = readtarget.get_input_vector_as_unsigned_int();
     
     InteractiveMarkovModel model(args.k[0], args.alphabet_size, args.alpha);
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
 
     model.fill_with_vector(input_vector);
-    model.get_markov_table().print();
-    model.get_markov_table().normalize(0.0001);
     all_models.fill_with_vector(input_vector);
 
     auto mdl = model.get_markov_table();

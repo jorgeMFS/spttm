@@ -21,6 +21,24 @@ void InteractiveMarkovModel::set_markov_table(MarkovTable mkvtab){
 MarkovTable InteractiveMarkovModel::get_markov_table() const {
     return this->mrkvTable;
 }
+
+double InteractiveMarkovModel::get_value(unsigned int i, unsigned int j) const{
+    return this->mrkvTable.get_value(i,j);
+}
+
+double InteractiveMarkovModel::get_value_from_normalized_fcm(unsigned int i, unsigned int j) const{
+    return this->mrkvTable.get_value_from_normalized_fcm(i, j);
+}
+
+void InteractiveMarkovModel::normalize(double &lambda) {
+    this->mrkvTable.normalize(lambda);
+}
+
+std::vector<double> InteractiveMarkovModel::get_normalized_vector() const {
+    return this->mrkvTable.get_normalized_vector();
+}
+
+
 std::vector<unsigned int> InteractiveMarkovModel::get_markov_table_vector() const{
     return this->mrkvTable.get_vector();
 }

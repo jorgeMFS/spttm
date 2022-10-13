@@ -28,6 +28,7 @@ objects2 = src/tmId.o \
 
 objects3 = src/tmId.o \
 		  src/turingMachine.o \
+		  src/interactiveMarkovModel.o \
  		  src/stringProcess.o \
 		  src/markovTable.o \
 		  src/util.o \
@@ -59,7 +60,7 @@ nrc_object = src/tmId.o \
 			src/nrc.o \
 			src/compute_nrc.o
 
-crss_ent = src/tmId.o \
+Loss = src/tmId.o \
 			src/turingMachine.o \
 			src/interactiveMarkovModel.o \
 			src/stringProcess.o \
@@ -67,8 +68,8 @@ crss_ent = src/tmId.o \
 			src/parseArgs.o \
 			src/util.o \
 			src/read_input.o \
-			src/crss_ent.o \
-			src/main_cross_entropy.o
+			src/kullbackLeiblerDivergency.o \
+			src/loss.o
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -85,7 +86,7 @@ tprl: $(objects3)
 nrc: $(nrc_object)
 	$(CXX) $(LFLAGS) $^ -o $@
 
-crss_ent: $(crss_ent)
+loss: $(Loss)
 	$(CXX) $(LFLAGS) $^ -o $@
 
 spark: $(objects4)
@@ -96,7 +97,7 @@ all: sptm \
 	 run \
 	 tprl \
 	 nrc \
-	 crss_ent \
+	 loss \
 	 spark
 
 clean:
@@ -105,12 +106,12 @@ clean:
 	rm -f src/*.o tprl
 	rm -f src/*o nrc
 	rm -f src/*o nrc
-	rm -f src/*o crss_ent
+	rm -f src/*o loss
 	rm -f src/*.o spark
 
 # Dependencies
 
-main_cross_entropy.o: src/main_cross_entropy.cpp src/parseArgs.h src/stringProcess.h src/crss_ent.h
+loss.o: src/loss.cpp src/parseArgs.h src/stringProcess.h src/kullbackLeiblerDivergency.h
 
 compute_nrc.o: src/compute_nrc.cpp src/parseArgs.h src/stringProcess.h src/nrc.h
 
@@ -126,7 +127,7 @@ src/tmId.o: src/tmId.cpp src/tmId.h
 
 src/util.o: src/util.cpp src/util.h
 
-src/stringProcess.o: src/stringProcess.cpp src/stringProcess.h src/markovTable.h
+src/stringProcess.o: src/stringProcess.cpp src/stringProcess.h src/markovTable.h src/interactiveMarkovModel.h
 
 src/turingMachine.o: src/turingMachine.cpp src/turingMachine.h src/tmId.h
 
@@ -144,6 +145,6 @@ src/tprl.o: src/tprl.cpp src/tprl.h
 
 src/nrc.o: src/nrc.cpp src/nrc.h
 
-src/crss_ent.o: src/crss_ent.cpp src/crss_ent.h
+src/kullbackLeiblerDivergency.o: src/kullbackLeiblerDivergency.cpp src/kullbackLeiblerDivergency.h
 
 src/read_input.o: src/read_input.cpp src/read_input.h 

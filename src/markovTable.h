@@ -30,6 +30,7 @@ using Char = unsigned int;
  */
 struct MarkovTable{
   std::vector<unsigned int> markovVector;
+  std::vector<double> normalized_fcm;
   unsigned int alphSz;
   unsigned int k;
   double alpha;
@@ -40,8 +41,11 @@ struct MarkovTable{
    */
   MarkovTable(unsigned int k, unsigned int alphabet_size, double alpha);
   
-  std::vector<double> normalize(double lambda) const;
+  void normalize(double lambda);
 
+  unsigned int sum_all_elem() const;
+  
+  std::vector<double> get_normalized_vector() const;
   /**
    * Accesses position on Markov Table, by providing a pointer to a position on array of TM characters.
    */
@@ -82,6 +86,9 @@ struct MarkovTable{
 
   /// Prints Markov Table.
   void print() const;
+
+   /// Prints Markov Table.
+  void print_normalization() const;
   
   /// Prints Markov Table.
   void print_all() const;
@@ -91,6 +98,12 @@ struct MarkovTable{
   
   /// Returns context alpha used on table.
   double get_alpha() const;
+  
+  /// Returns value of index at Markov table
+  double get_value(unsigned int i, unsigned int j) const;
+
+  // Returns value of index at Markov table
+  double get_value_from_normalized_fcm(unsigned int i, unsigned int j) const;
 
 
   std::vector<unsigned int> get_vector() const;

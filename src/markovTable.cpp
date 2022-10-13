@@ -15,19 +15,15 @@
 
 
 MarkovTable::MarkovTable(unsigned int k, unsigned int alphabet_size, double alpha):
-  markovVector(alphabet_size* ipow(alphabet_size,k),0), alphSz(alphabet_size), k(k),alpha(alpha){}
-
+  markovVector(alphabet_size* ipow(alphabet_size,k),0), normalized_fcm(alphabet_size* ipow(alphabet_size,k),0) ,alphSz(alphabet_size), k(k),alpha(alpha){}
 
 unsigned int MarkovTable::get_context() const{
     return this->k;
 }
-std::vector<double> MarkovTable::normalize(double lambda) const {
-
-    std::vector<double> nMK(markovVector.size(),0);
+void MarkovTable::normalize(double lambda) {
+    normalized_fcm.clear();
     // for each line, normalize by max value + alpha;
-    std::cout << std::endl;
     unsigned int counter = 0;
-    std::vector<double> mrkvM;
     std::vector<double> line;
     double denominator=0.0;
     for(auto&& x: this->markovVector){    
@@ -37,24 +33,16 @@ std::vector<double> MarkovTable::normalize(double lambda) const {
         if(++counter == this->alphSz){
             counter=0;
             std::transform(line.begin(), line.end(), line.begin(), [denominator](double &c){ return c/denominator; });
-            mrkvM.insert(mrkvM.end(), line.begin(), line.end());
+            normalized_fcm.insert(normalized_fcm.end(), line.begin(), line.end());
             denominator=0;
             line.clear();
         }
     }
-    
-    counter = 0;
-    for(auto&& x: mrkvM){  
-        std::cout << x << "\t";
-        
-        if(++counter == this->alphSz){
-            counter=0;
-            std::cout << std::endl;
-        }
-    }
-    return mrkvM;
 };
 
+std::vector<double> MarkovTable::get_normalized_vector() const {
+    return this->normalized_fcm;
+}
 
 std::vector<unsigned int> MarkovTable::get_vector() const{
     return this->markovVector;
@@ -98,6 +86,13 @@ std::pair<double,double> MarkovTable::debug_predict_and_update(const Char* chara
     return std::pair<double,double>(value, log);
 }
 
+double MarkovTable::get_value(unsigned int i, unsigned int j) const{
+    return markovVector.at((i*alphSz)+j);
+}
+
+double MarkovTable::get_value_from_normalized_fcm(unsigned int i, unsigned int j) const{
+    return normalized_fcm.at((i*alphSz)+j);
+}
 
 /**
 * computes the numerator at index 
@@ -173,6 +168,55 @@ void MarkovTable::print_all() const{
     std::cout << std::endl;
 }
 
+void MarkovTable::print_normalization() const{
+ unsigned int counter = 0;
+    std::cout << std::endl;
+    std::cout << bold_on << underlined_on << green_on <<"FCM Normalized" << bold_off;
+
+    std::vector<char> alphabet;
+    std::cout << std::endl << bold_on  << green_on << "_______"  << bold_off;
+    for(auto letter=0u; letter<this->alphSz; ++letter){
+        std::cout << bold_on  << green_on << "_______"  << bold_off;
+    }
+    std::cout<<std::endl<<"\t";
+    for(auto letter=0u; letter<this->alphSz; ++letter){
+        std::cout << bold_on  << green_on  << letter  << bold_off<< "\t";
+        alphabet.push_back(std::to_string(letter)[0]);
+    }
+    std::vector<std::string> results;
+    generate_words(alphabet, this->k,results);
+   
+    std::cout << std::endl << bold_on  << green_on << "-------" << bold_off;
+    for(auto letter=0u; letter<this->alphSz; ++letter){
+        std::cout << bold_on  << green_on << "-------" << bold_off;
+    }
+    unsigned int cntr = 0;
+    std::cout << std::endl << bold_on << green_on  << results[cntr] << " | " << bold_off << "\t";
+    
+    for(auto&& x: this->normalized_fcm){    
+
+            if (x>0) {
+                std::cout << bold_on << red_on << x << "\t" << bold_off;
+            }
+            else{
+                std::cout << bold_on << cyan_on << x << "\t" << bold_off;
+            } 
+            if(++counter == this->alphSz){
+                if(++cntr<results.size()){
+                    std::cout << std::endl << bold_on << green_on << results[cntr] << " | "  << bold_off << "\t";
+                    counter = 0;
+                }
+            }
+    }
+    std::cout << std::endl;
+
+}
+unsigned int MarkovTable::sum_all_elem() const{
+     auto sum_of_elems=0u;
+     for (auto& n : markovVector)
+        sum_of_elems += n;
+    return sum_of_elems;
+}   
 void MarkovTable::print() const{
     unsigned int counter = 0;
     std::cout << std::endl;

@@ -13,11 +13,11 @@
 
 
 #include "parseArgs.h"
-#include "crss_ent.h"
+#include "kullbackLeiblerDivergency.h"
 
 int main (int argc, char **argv){
 
     Args argument = parseArgs(argc,argv);
     printArgs(argument);
-    crss_ent crss_ent(argument);
+    KullbackLeiblerDivergency kullbackLeiblerDivergency(argument);
 }

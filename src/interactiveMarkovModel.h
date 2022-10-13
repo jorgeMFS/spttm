@@ -24,6 +24,13 @@ struct InteractiveMarkovModel{
     // InteractiveMarkovModel(const InteractiveMarkovModel& other_model);
     /** Retrieve a copy of the inner Markov table */
     MarkovTable get_markov_table() const;
+    double get_value(unsigned int i, unsigned int j) const;
+    double get_value_from_normalized_fcm(unsigned int i, unsigned int j) const;
+    /** reads Markov Table and Normalizes it line by line*/
+    void normalize(double &lambda);
+    
+    /** Get normalized fcm */
+    std::vector<double> get_normalized_vector() const;
 
     /** reads input vector and creates Markov Model*/
     void  fill_with_vector(const std::vector<unsigned int> &input_vector);
@@ -81,13 +88,47 @@ struct AllInteractiveMarkovModel{
             InteractiveMarkovModels.emplace_back(*iterator, alphabet_size, alpha);
         }
     }   
-    
+
     void set_markov_tables(MarkovTable mkvtab, unsigned int index){
         this->InteractiveMarkovModels[index].set_markov_table(mkvtab);
     }
 
     MarkovTable get_markov_tables(unsigned int index) const {
         return this->InteractiveMarkovModels[index].get_markov_table();
+    }
+
+    std::vector<double> get_value(unsigned int i, unsigned int j) const{
+        std::vector<double> value_vec;
+        for(auto k=0u;i<InteractiveMarkovModels.size();++k){ 
+            value_vec.push_back(InteractiveMarkovModels[k].get_value(i,j));
+        }
+        return value_vec;
+    }
+
+    
+    std::vector<double>  get_value_from_normalized_fcm(unsigned int i, unsigned int j) const{
+        std::vector<double> value_vec;
+        for(auto k=0u;i<InteractiveMarkovModels.size();++k){ 
+            value_vec.push_back(InteractiveMarkovModels[k].get_value_from_normalized_fcm(i,j));
+        }
+        return value_vec;
+    }
+
+    std::vector<std::vector<double>> get_normalized_vector() const {
+        std::vector<std::vector<double>> normalized_fcms;
+
+        for(auto k=0u;k<InteractiveMarkovModels.size();++k){ 
+            normalized_fcms.push_back(InteractiveMarkovModels[k].get_normalized_vector());
+        }
+        
+        return normalized_fcms;
+    }
+
+
+    void normalize(double &lambda){
+        for(auto i=0u;i<InteractiveMarkovModels.size();++i){
+            InteractiveMarkovModels[i].normalize(lambda);
+        }
     }
 
     std::vector<unsigned int> get_markov_table_vectors(unsigned int index) const{

@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <map>
-
+#include "parseArgs.h"
 #include "markovTable.h"
 
 struct empty_string_exception: public std::exception {
@@ -30,10 +30,15 @@ struct StringProcess{
     StringProcess(size_t alphabet_size);
     StringProcess(std::string input_file,size_t alphabet_size);
     StringProcess(StateMatrix input_rm, unsigned int tape_it, unsigned int k);
+
     /** Returns copy of input vector */    
     std::vector<char> get_input_vector() const;
     std::vector<std::vector<unsigned int>> get_all_transcribed_vectors() const;
     std::vector<unsigned int> get_transcribed_vector(unsigned int const & index) const;
+    
+    std::vector<MarkovTable> get_models(Args &args, std::vector<unsigned int> &confirmation_vector, bool print_bool) const;
+
+
     /** Sets new input vector and recalculates normalizer*/    
     void set_input_vector_and_normalize(std::vector<unsigned int>& new_input_vector);
     void print_map(std::map<char, unsigned int> & map) const;
