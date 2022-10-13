@@ -19,14 +19,11 @@ void crss_ent::init(Args args){
 
     model.fill_with_vector(input_vector);
     model.get_markov_table().print();
-    model.get_markov_table().normalize(0.0001);
+    model.get_markov_table().normalize(args.lambda);// lambda
     all_models.fill_with_vector(input_vector);
 
     std::cout << "NRC value -> k:" << args.k.front() <<":"<< args.k.back()<<std::endl;
-    for(auto &x:nrc_values){
-                std::cout << x << "\t";
-    }
-    
+  
 }
 
 

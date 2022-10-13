@@ -59,6 +59,17 @@ nrc_object = src/tmId.o \
 			src/nrc.o \
 			src/compute_nrc.o
 
+crss_ent = src/tmId.o \
+			src/turingMachine.o \
+			src/interactiveMarkovModel.o \
+			src/stringProcess.o \
+			src/markovTable.o \
+			src/parseArgs.o \
+			src/util.o \
+			src/read_input.o \
+			src/crss_ent.o \
+			src/main_cross_entropy.o
+
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
@@ -74,6 +85,9 @@ tprl: $(objects3)
 nrc: $(nrc_object)
 	$(CXX) $(LFLAGS) $^ -o $@
 
+crss_ent: $(crss_ent)
+	$(CXX) $(LFLAGS) $^ -o $@
+
 spark: $(objects4)
 	$(CXX) $(LFLAGS) $^ -o $@
 
@@ -82,6 +96,7 @@ all: sptm \
 	 run \
 	 tprl \
 	 nrc \
+	 crss_ent \
 	 spark
 
 clean:
@@ -89,11 +104,15 @@ clean:
 	rm -f src/*.o run
 	rm -f src/*.o tprl
 	rm -f src/*o nrc
+	rm -f src/*o nrc
+	rm -f src/*o crss_ent
 	rm -f src/*.o spark
 
 # Dependencies
 
-compute_nrc: src/compute_nrc.cpp src/parseArgs.h src/stringProcess.h src/nrc.h
+main_cross_entropy.o: src/main_cross_entropy.cpp src/parseArgs.h src/stringProcess.h src/crss_ent.h
+
+compute_nrc.o: src/compute_nrc.cpp src/parseArgs.h src/stringProcess.h src/nrc.h
 
 main_search.o: src/main_search.cpp src/parseArgs.h src/stringProcess.h
 
@@ -124,5 +143,7 @@ src/sptm.o: src/spark.cpp src/spark.h
 src/tprl.o: src/tprl.cpp src/tprl.h
 
 src/nrc.o: src/nrc.cpp src/nrc.h
+
+src/crss_ent.o: src/crss_ent.cpp src/crss_ent.h
 
 src/read_input.o: src/read_input.cpp src/read_input.h 

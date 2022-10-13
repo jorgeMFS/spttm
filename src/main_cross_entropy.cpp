@@ -13,7 +13,7 @@
 
 
 #include "parseArgs.h"
-#include "nrc.h"
+#include "crss_ent.h"
 
 int main (int argc, char **argv){
 

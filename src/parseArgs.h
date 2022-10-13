@@ -21,6 +21,7 @@ struct Args{
     unsigned int tape_iterations = 0;
     std::vector <unsigned int> k;
     double alpha = 1;
+    double lambda = 1;
     TmId n = 0;
     unsigned int c = 0;
     std::string input_file ="";

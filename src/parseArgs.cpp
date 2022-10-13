@@ -34,6 +34,7 @@ Args parseArgs (int argc, char **argv){
             {"alpha", required_argument, 0 , 'A'},
             {"number_output_lines", optional_argument, 0, 'o'},
             {"threshold", optional_argument, 0, 'T'},
+            {"lambda", optional_argument, 0, 'l'},
             {"input_file", optional_argument, 0 ,'f'},
             {"target_file", optional_argument, 0 ,'t'},
             {"number_files", optional_argument, 0 ,'N'},
@@ -42,7 +43,7 @@ Args parseArgs (int argc, char **argv){
         };
         int option_index = 0;
 
-        int c = getopt_long (argc, argv, "e:s:a:A:i:o:T:k:f:t:N:S:h",
+        int c = getopt_long (argc, argv, "e:s:a:A:i:o:T:l:k:f:t:N:S:h",
                         long_options, &option_index);
 
         if (c == -1)
@@ -184,6 +185,23 @@ Args parseArgs (int argc, char **argv){
             break;
         }
 
+        case 'l':
+            {
+            double correctInput = strtof(optarg, &end);
+            if (*end != '\0') {
+            std::cerr << "invalid input for -l/--lambda.\n";
+            exit(0);
+            }
+            else if (correctInput<0 || correctInput>1){
+            printf ("-l/--lambda value was set to %f, must be a double that belongs to the interval [0,1].\n",correctInput); 
+            exit(0);
+            }
+            else {
+                argument.lambda = correctInput;
+                }
+            break;
+        }
+
         case 'k':
         {   
             std::pair<unsigned int,unsigned int> k_limits;
@@ -247,7 +265,6 @@ Args parseArgs (int argc, char **argv){
         
         case 'f':
         {
-            // std::string input_file = optarg;
             argument.input_file = optarg;
             break;
         }
@@ -303,23 +320,24 @@ Args parseArgs (int argc, char **argv){
 
 
 void printArgs(Args arguments){
-    std::cout<< bold_on << "Seed = " << arguments.sd << bold_off << std::endl;
-    std::cout<< "States = " << arguments.states << std::endl;
-    std::cout<< "Alphabet Size = " << arguments.alphabet_size<< std::endl;
-    std::cout<< "Tape Iterations = " << arguments.tape_iterations << std::endl;
-    std::cout<< "Input file : " << arguments.input_file << std::endl;
-    std::cout<< "Target file : " << arguments.target_file << std::endl;
-    std::cout<< "Number of files : " << arguments.n_files << std::endl;
-    std::cout<< "Threshold : " << arguments.threshold << std::endl;
+    std::cout<< bold_on << "Seed => " << arguments.sd << bold_off << std::endl;
+    std::cout<< "States => " << arguments.states << std::endl;
+    std::cout<< "Alphabet Size => " << arguments.alphabet_size<< std::endl;
+    std::cout<< "Tape Iterations => " << arguments.tape_iterations << std::endl;
+    std::cout<< "Input file => " << arguments.input_file << std::endl;
+    std::cout<< "Target file => " << arguments.target_file << std::endl;
+    std::cout<< "Number of files => " << arguments.n_files << std::endl;
+    std::cout<< "Threshold => " << arguments.threshold << std::endl;
+     std::cout<< "Lambda => " << arguments.lambda << std::endl;
     if (arguments.k.size()>1){
-        std::cout<<"k = " << arguments.k.front()<<  ":" << arguments.k.back() << std::endl;
+        std::cout<<"k => " << arguments.k.front()<<  ":" << arguments.k.back() << std::endl;
     }
     else if (arguments.k.size()==1){
-        std::cout<<"k = " << arguments.k.front() << std::endl;
+        std::cout<<"k => " << arguments.k.front() << std::endl;
     }
-    std::cout<< "Alpha = " << arguments.alpha << std::endl;
-    std::cout<< "Number of output lines = " << arguments.num_out_lines << std::endl;
-    std::cout<< "Search Strategy = " << arguments.search_strategy << std::endl;
+    std::cout<< "Alpha => " << arguments.alpha << std::endl;
+    std::cout<< "Number of output lines => " << arguments.num_out_lines << std::endl;
+    std::cout<< "Search Strategy => " << arguments.search_strategy << std::endl;
 }
 
 void help(){
