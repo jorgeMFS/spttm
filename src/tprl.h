@@ -5,7 +5,7 @@
 #include "stringProcess.h"
 struct tprl{
     
-    // StringProcess str;
+    bool print_all_bool;
     unsigned int index;
     unsigned int num_it;
     unsigned int input_amplitude;
@@ -14,7 +14,8 @@ struct tprl{
     StateMatrix st;
     std::minstd_rand rng;
 
-    tprl(Args args);
+    tprl(Args args, bool print_all_bool);
     void step(Args args);
+    void step_2(Args args);
 };
     std::tuple<StateMatrix, unsigned long long, std::vector<unsigned int>, double, unsigned int>read_file();

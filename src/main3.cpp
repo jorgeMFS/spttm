@@ -8,5 +8,20 @@
 int main (int argc, char **argv){
   Args argument = parseArgs(argc,argv);  
   printArgs(argument);
-  tprl tprl(argument);
+  bool print_all;
+  char answer;
+  std::cerr << " Do you want to print all tm information (Y/N)?\n";
+  std::cin >> answer;
+  switch( answer )
+  {
+  case 'Y': case 'y': 
+    print_all = true;
+    break;
+
+  case 'N': case 'n':
+    print_all = false;
+    break;
+  }
+
+  tprl tprl(argument,print_all);
 }

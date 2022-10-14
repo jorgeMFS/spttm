@@ -192,8 +192,6 @@ bool StateMatrix::operator>(const StateMatrix &st1) const{
 
 }
 
-
-
 bool StateMatrix::operator<(const StateMatrix &st1) const{return this->v.size() < st1.v.size();}
 
 
