@@ -74,7 +74,7 @@ Example of runing nrc:
 
 Example of runing spark:
 ```
-./spark   -e 555 -s 2 -a 2 -i 100 -A 20 -k 2 -f "A" -o 20 -T 0.5 -S S
+./spark   -e 777 -s 4 -a 2 -i 1000 -l 0.001 -k 2:3 -T 0 -S S -t "tapeTestPool/A_1"
 ```
 
 
