@@ -32,6 +32,7 @@
 *.app
 
 #Folders
-/dataset/*
-/tapes/*
+dataset/*
+tapes/*
+tapeTestPool/*
 ./vscode
