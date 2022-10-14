@@ -81,6 +81,7 @@ struct StringProcess{
     */
     void print() const;
     void print_transcribed_vector(unsigned int index_transcribed_vector) const;
+    void print_transcribed_vector_tapes(unsigned int index_transcribed_vector) const;
     void print_maps()const;
     void printInputVector() const;
     

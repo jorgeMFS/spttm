@@ -112,6 +112,7 @@ void tm_fl_cardinality(size_t states, size_t alphabet_size){
     power(record_cardinality, nstates * nalphabet);
 }
 
+
 /// Create the list of the number of machines with the growth of the number of states.
 void tm_growth_with_cardinality(size_t max_number_states){
     size_t min_number_states = 1;

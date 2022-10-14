@@ -278,9 +278,9 @@ Args parseArgs (int argc, char **argv){
             if (std::strcmp(optarg, "S") == 0) {
                 argument.search_strategy = "Sequential";
             } else if (std::strcmp(optarg, "M") == 0) {
-                argument.search_strategy = "monte_carlo";
+                argument.search_strategy = "Monte_Carlo";
             } else if (std::strcmp(optarg, "N") == 0) {
-                argument.search_strategy = "neural_networks";
+                argument.search_strategy = "Neural_Networks";
             } else {
                 std::cerr << "-S/--strategy must be either `sequential` or `monte_carlo`." << std::endl;
                 exit(0);

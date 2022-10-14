@@ -57,6 +57,8 @@ struct InteractiveMarkovModel{
      * @param tape. Tape object of the Turing Machine.
      */
     void add_other_tape(const Tape& tape);
+
+    void reset();
     private:
     /**
      * Fills Markov Table. It interacts directly with the table and controls its filling.
@@ -158,17 +160,9 @@ struct AllInteractiveMarkovModel{
     }
 
     void fill_with_vector_from_tape(const std::vector<unsigned int> &input_vector, std::vector<unsigned int> &k){
-        std::vector<unsigned int> vector_to_read;
          for(auto i=0u;i<InteractiveMarkovModels.size();++i){
-            vector_to_read.clear();
-            std::vector<unsigned int> vector_zeros(k[i], 0);
-            vector_to_read.insert(vector_zeros.end(), input_vector.begin(), input_vector.end() );
-            // delete later after debug
-            for (auto i: vector_to_read){
-                std::cout << i;
-            }
-            std::cout << std::endl;
-            // 
+            std::vector<unsigned int> vector_to_read(k[i], 0);
+            vector_to_read.insert(vector_to_read.end(), input_vector.begin(), input_vector.end() );
             InteractiveMarkovModels[i].fill_with_vector(vector_to_read);
         }
     }
@@ -176,6 +170,12 @@ struct AllInteractiveMarkovModel{
     void fills(const Tape &tape){
         for(auto i=0u;i<InteractiveMarkovModels.size();++i){
             InteractiveMarkovModels[i].fill(tape);
+        }
+    }
+
+    void reset(){
+        for(auto i=0u;i<InteractiveMarkovModels.size();++i){
+            InteractiveMarkovModels[i].reset();
         }
     }
 

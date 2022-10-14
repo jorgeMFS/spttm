@@ -8,6 +8,7 @@ KullbackLeiblerDivergency::KullbackLeiblerDivergency(Args args, bool tm_bool):ta
 }
 
 void KullbackLeiblerDivergency::init(bool tm_bool){
+
     ReadInput readtarget(args.target_file);
 
     auto target_vector = readtarget.get_input_vector_as_unsigned_int();

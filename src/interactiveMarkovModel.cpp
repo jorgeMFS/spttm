@@ -165,3 +165,8 @@ void InteractiveMarkovModel::edit(std::vector<unsigned int>::iterator begin, std
     }         
     tape.tape[changedPosition] = tpMv.writtenValue;    
 }
+
+void InteractiveMarkovModel::reset(){
+    this->mrkvTable.reset();
+    isFilled = false;
+}

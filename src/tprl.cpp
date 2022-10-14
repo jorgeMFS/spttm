@@ -84,8 +84,6 @@ void tprl::step_2(Args args){
     std::string file = "./tapeTestPool/"+args.input_file+"_"+std::to_string(++counter);
     std::ofstream outFile(file);
     
-    TapeMoves tpMove;
-    std::vector<unsigned int> recordM;
     std::vector<std::vector<Char>> tapes;
     st.set_random(rng);
     TuringMachine tm(st);
@@ -102,18 +100,14 @@ void tprl::step_2(Args args){
     
     //get NRC or cycle.
     for (auto i = 0u; i < args.tape_iterations; ++i){
-        auto tuple_tp_rule = tm.act_rule(); // grave esti antaŭe
+        tm.act_rule(); // grave esti antaŭe
     }
 
     auto tp = tm.get_tape().get_tape_vector(0);
 
-    auto st_m  = st.print_st_matrix_vector();
-    outFile << st_m;
-    outFile  << std::endl;
-    for(const auto &e : recordM){
-            outFile  << e << ",";
-    }
-    outFile  << std::endl;
+    // auto st_m  = st.print_st_matrix_vector();
+    // outFile << st_m;
+    // outFile  << std::endl;
     for (const auto &el: tp){
         outFile  << el;
     }

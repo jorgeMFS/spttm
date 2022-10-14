@@ -70,8 +70,8 @@ spark_object = src/tmId.o \
 		  src/read_input.o \
 		  src/kullbackLeiblerDivergency.o\
 		  src/loss.o\
-		  src/spark.o \
- 		  src/main_search.o
+		  src/search.o\
+		  src/spark.o
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -113,42 +113,52 @@ clean:
 
 # Dependencies
 
-kld.o: src/kl_divergence_main.cpp src/parseArgs.h src/stringProcess.h src/kullbackLeiblerDivergency.h
-
-compute_nrc.o: src/compute_nrc.cpp src/parseArgs.h src/stringProcess.h src/nrc.h
-
-main_search.o: src/main_search.cpp src/parseArgs.h src/stringProcess.h
-
 main.o: src/main.cpp src/parseArgs.h src/stringProcess.h
 
 main2.o: src/main2.cpp src/interactiveMarkovModel.h
 
 main3.o: src/main3.cpp src/parseArgs.h
 
-src/tmId.o: src/tmId.cpp src/tmId.h 
+kld.o: src/kl_divergence_main.cpp src/parseArgs.h src/stringProcess.h src/kullbackLeiblerDivergency.h
 
-src/util.o: src/util.cpp src/util.h
+compute_nrc.o: src/compute_nrc.cpp src/parseArgs.h src/stringProcess.h src/nrc.h
 
-src/stringProcess.o: src/stringProcess.cpp src/stringProcess.h src/markovTable.h src/interactiveMarkovModel.h
+spark.o: src/spark.cpp src/parseArgs.h src/search.h
 
-src/turingMachine.o: src/turingMachine.cpp src/turingMachine.h src/tmId.h
-
-src/parseArgs.o: src/parseArgs.cpp src/parseArgs.h src/util.h
-
-src/markovTable.o: src/markovTable.cpp src/markovTable.h src/turingMachine.h src/util.h
 
 src/interactiveMarkovModel.o: src/interactiveMarkovModel.cpp src/interactiveMarkovModel.h src/markovTable.h
-
-src/sptm.o: src/sptm.cpp src/sptm.h 
-
-src/sptm.o: src/spark.cpp src/spark.h 
-
-src/tprl.o: src/tprl.cpp src/tprl.h
-
-src/nrc.o: src/nrc.cpp src/nrc.h
 
 src/kullbackLeiblerDivergency.o: src/kullbackLeiblerDivergency.cpp src/kullbackLeiblerDivergency.h
 
 src/loss.o: src/loss.cpp src/loss.h src/kullbackLeiblerDivergency.h
 
+src/nrc.o: src/nrc.cpp src/nrc.h
+
+src/markovTable.o: src/markovTable.cpp src/markovTable.h src/turingMachine.h src/util.h
+
+src/parseArgs.o: src/parseArgs.cpp src/parseArgs.h src/util.h
+
+src/search.o: src/search.cpp src/search.h src/loss.h 
+
 src/read_input.o: src/read_input.cpp src/read_input.h 
+
+src/sptm.o: src/sptm.cpp src/sptm.h 
+
+src/stringProcess.o: src/stringProcess.cpp src/stringProcess.h src/markovTable.h src/interactiveMarkovModel.h
+
+src/turingMachine.o: src/turingMachine.cpp src/turingMachine.h src/tmId.h
+
+src/tmId.o: src/tmId.cpp src/tmId.h 
+
+src/tprl.o: src/tprl.cpp src/tprl.h
+
+src/util.o: src/util.cpp src/util.h
+
+
+
+
+
+
+
+
+

@@ -110,17 +110,17 @@ std::vector<double> StringProcess::readinput(MarkovTable& markovTable) const {
 
 std::vector<MarkovTable> StringProcess::get_models(Args &args,std::vector<unsigned int> &confirmation_vector, bool &tm_bool, bool &print_bool) const{
   unsigned int index;
+ 
   for (auto i=0u; i<transcribed_vectors.size(); ++i){
-    if(get_transcribed_vector(i) == confirmation_vector){
+    if( get_transcribed_vector(i) == confirmation_vector){
         index=i;
       }
   }
-    if(print_bool){
-      print_transcribed_vector(index);
+  if(print_bool){
+      for(auto&x:get_transcribed_vector(index))
+      std::cout<<x;
   }
-
   AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, m_cardinality, args.alpha);
-  
   if(tm_bool){
     all_models.fill_with_vector_from_tape(get_transcribed_vector(index),args.k);
     return all_models.get_markov_tables();
@@ -206,6 +206,15 @@ void StringProcess::print_transcribed_vector(unsigned int index_transcribed_vect
     }
   std::cout << std::endl;
 }
+
+void StringProcess::print_transcribed_vector_tapes(unsigned int index_transcribed_vector) const{
+  auto retrieved_vector=this->transcribed_vectors[index_transcribed_vector];
+  for (auto it = retrieved_vector.begin(); it != retrieved_vector.end(); ++it){
+      std::cout << " " << *it;
+    }
+  std::cout << std::endl;
+}
+
 
 
 void StringProcess::printInputVector()const{
