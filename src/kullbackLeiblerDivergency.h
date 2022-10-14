@@ -15,14 +15,21 @@
 
 struct KullbackLeiblerDivergency{
 
-    StringProcess target;
-    KullbackLeiblerDivergency(Args args);
     
+    KullbackLeiblerDivergency(Args args);
+
+    public:
+        void run_w_input_file();
+        std::vector<double> compute_divergency_pconditional(std::vector<MarkovTable> &mk_input_vector) const;
+        std::vector<double> compute_divergency_p_k_elem(std::vector<MarkovTable> &mk_input_vector) const;
+
     private:
-        void init(Args args);
-        double compute_crss_ent(MarkovTable &mk_input, MarkovTable &mk_target, double &lambda) const;
-        double compute_divergency_pconditional(MarkovTable &mk_input, MarkovTable &mk_target, double &lambda) const;
+        StringProcess target;
+        Args args;
+        std::vector<MarkovTable> mk_target_vector;
+        
+        void init();
+        double compute_divergency_pconditional(MarkovTable &mk_input, MarkovTable &mk_target) const;
         double compute_divergency_p_k_elem(MarkovTable &mk_input, MarkovTable &mk_target) const;
-        std::vector<double> compute_divergency_pconditional(std::vector<MarkovTable> &mk_input_vector, std::vector<MarkovTable> &mk_target_vector, double &lambda) const;
-        std::vector<double> compute_divergency_p_k_elem(std::vector<MarkovTable> &mk_input_vector, std::vector<MarkovTable> &mk_target_vector, double &lambda) const;
 };
+
