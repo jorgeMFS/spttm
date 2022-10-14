@@ -3,7 +3,7 @@
 
 struct Loss{
     
-    Loss(Args &args, double &weight> &mkv_table_vector);
+    Loss(Args &args, double &weight);
 
     private:
         double w;
@@ -11,3 +11,4 @@ struct Loss{
         double compute_loss(std::vector<MarkovTable> &mkv_table_vector);
         double average_divergence_vector(std::vector<double> &divergence_vector);
 };
+
