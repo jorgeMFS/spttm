@@ -35,4 +35,6 @@
 dataset/*
 tapes/*
 tapeTestPool/*
-./vscode
+
+#json
+.vscode/settings.json
