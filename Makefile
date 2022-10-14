@@ -37,18 +37,6 @@ objects3 = src/tmId.o \
 		  src/tprl.o \
  		  src/main3.o 
 
-objects4 = src/tmId.o \
-		  src/turingMachine.o \
-		  src/interactiveMarkovModel.o \
-		  src/stringProcess.o \
-		  src/markovTable.o \
-		  src/parseArgs.o \
-		  src/util.o \
-		  src/sptm.o \
-		  src/spark.o \
-		  src/read_input.o \
- 		  src/main_search.o
-
 nrc_object = src/tmId.o \
 			src/turingMachine.o \
 			src/interactiveMarkovModel.o \
@@ -60,7 +48,7 @@ nrc_object = src/tmId.o \
 			src/nrc.o \
 			src/compute_nrc.o
 
-Loss = src/tmId.o \
+kld_object = src/tmId.o \
 			src/turingMachine.o \
 			src/interactiveMarkovModel.o \
 			src/stringProcess.o \
@@ -69,7 +57,21 @@ Loss = src/tmId.o \
 			src/util.o \
 			src/read_input.o \
 			src/kullbackLeiblerDivergency.o \
-			src/loss.o
+			src/kl_divergence_main.o
+
+spark_object = src/tmId.o \
+		  src/turingMachine.o \
+		  src/interactiveMarkovModel.o \
+		  src/stringProcess.o \
+		  src/markovTable.o \
+		  src/parseArgs.o \
+		  src/util.o \
+		  src/sptm.o \
+		  src/read_input.o \
+		  src/kullbackLeiblerDivergency.o\
+		  src/loss.o\
+		  src/spark.o \
+ 		  src/main_search.o
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -86,10 +88,10 @@ tprl: $(objects3)
 nrc: $(nrc_object)
 	$(CXX) $(LFLAGS) $^ -o $@
 
-loss: $(Loss)
+kld: $(kld_object)
 	$(CXX) $(LFLAGS) $^ -o $@
 
-spark: $(objects4)
+spark: $(spark_object)
 	$(CXX) $(LFLAGS) $^ -o $@
 
 
@@ -97,7 +99,7 @@ all: sptm \
 	 run \
 	 tprl \
 	 nrc \
-	 loss \
+	 kld \
 	 spark
 
 clean:
@@ -106,12 +108,12 @@ clean:
 	rm -f src/*.o tprl
 	rm -f src/*o nrc
 	rm -f src/*o nrc
-	rm -f src/*o loss
+	rm -f src/*o kld
 	rm -f src/*.o spark
 
 # Dependencies
 
-loss.o: src/loss.cpp src/parseArgs.h src/stringProcess.h src/kullbackLeiblerDivergency.h
+kld.o: src/kl_divergence_main.cpp src/parseArgs.h src/stringProcess.h src/kullbackLeiblerDivergency.h
 
 compute_nrc.o: src/compute_nrc.cpp src/parseArgs.h src/stringProcess.h src/nrc.h
 
@@ -146,5 +148,7 @@ src/tprl.o: src/tprl.cpp src/tprl.h
 src/nrc.o: src/nrc.cpp src/nrc.h
 
 src/kullbackLeiblerDivergency.o: src/kullbackLeiblerDivergency.cpp src/kullbackLeiblerDivergency.h
+
+src/loss.o: src/loss.cpp src/loss.h src/kullbackLeiblerDivergency.h
 
 src/read_input.o: src/read_input.cpp src/read_input.h 
