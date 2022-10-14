@@ -8,8 +8,8 @@ struct loss_weight_exception: public std::exception {
     }
 };
 
-
-Loss::Loss(Args &args, double &weight, std::vector<MarkovTable> &mkv_table_vector):w(weight),kl(args){
+// tm_bool in kl was set to true since we intend to use loss in TMs
+Loss::Loss(Args &args, double &weight):w(weight),kl(args,true){
     if(w>1 | w<0){
         throw loss_weight_exception{};
     }

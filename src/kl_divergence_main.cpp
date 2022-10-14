@@ -21,6 +21,6 @@ int main (int argc, char **argv){
 
     Args argument = parseArgs(argc,argv);
     printArgs(argument);
-    KullbackLeiblerDivergency kullbackLeiblerDivergency(argument);
+    KullbackLeiblerDivergency kullbackLeiblerDivergency(argument, false);
     kullbackLeiblerDivergency.run_w_input_file();
 }

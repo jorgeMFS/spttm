@@ -3,15 +3,16 @@
 #include "read_input.h"
 #include "interactiveMarkovModel.h"
 
-KullbackLeiblerDivergency::KullbackLeiblerDivergency(Args args):target(args.target_file, args.alphabet_size),args(args){
-    init();
+KullbackLeiblerDivergency::KullbackLeiblerDivergency(Args args, bool tm_bool):target(args.target_file, args.alphabet_size),args(args){
+    init(tm_bool);
 }
 
-void KullbackLeiblerDivergency::init(){
+void KullbackLeiblerDivergency::init(bool tm_bool){
     ReadInput readtarget(args.target_file);
 
     auto target_vector = readtarget.get_input_vector_as_unsigned_int();
-    mk_target_vector = target.get_models(args, target_vector, false);
+    bool print_bool = false;
+    mk_target_vector = target.get_models(args, target_vector, tm_bool, print_bool);
 }
 
 void KullbackLeiblerDivergency::run_w_input_file(){

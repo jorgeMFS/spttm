@@ -14,7 +14,8 @@
 #include <stdexcept>
 #include "parseArgs.h"
 #include "spark.h"
-
+#include "sequentialSearch.h"
+#include "monteCarloSearch.h"
 int main (int argc, char **argv){
 
     Args argument = parseArgs(argc,argv);
@@ -24,6 +25,12 @@ int main (int argc, char **argv){
     if (std::strcmp(strategy, "Null") == 0){
         throw std::invalid_argument("search_strategy argument can not be null in this program");
     }
+    // mode of search 1 - Sequential
+
+    // mode of search 2
+    // mode of search 3
+
+
     spark spark(argument);
   // spark.update();
   

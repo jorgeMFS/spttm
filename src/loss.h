@@ -3,7 +3,7 @@
 
 struct Loss{
     
-    Loss(Args &args, double &weight, std::vector<MarkovTable> &mkv_table_vector);
+    Loss(Args &args, double &weight> &mkv_table_vector);
 
     private:
         double w;

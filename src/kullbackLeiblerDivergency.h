@@ -16,7 +16,7 @@
 struct KullbackLeiblerDivergency{
 
     
-    KullbackLeiblerDivergency(Args args);
+    KullbackLeiblerDivergency(Args args, bool tm_bool);
 
     public:
         void run_w_input_file();
@@ -28,7 +28,7 @@ struct KullbackLeiblerDivergency{
         Args args;
         std::vector<MarkovTable> mk_target_vector;
         
-        void init();
+        void init(bool tm_bool);
         double compute_divergency_pconditional(MarkovTable &mk_input, MarkovTable &mk_target) const;
         double compute_divergency_p_k_elem(MarkovTable &mk_input, MarkovTable &mk_target) const;
 };

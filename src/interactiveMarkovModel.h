@@ -156,6 +156,23 @@ struct AllInteractiveMarkovModel{
         }
 
     }
+
+    void fill_with_vector_from_tape(const std::vector<unsigned int> &input_vector, std::vector<unsigned int> &k){
+        std::vector<unsigned int> vector_to_read;
+         for(auto i=0u;i<InteractiveMarkovModels.size();++i){
+            vector_to_read.clear();
+            std::vector<unsigned int> vector_zeros(k[i], 0);
+            vector_to_read.insert(vector_zeros.end(), input_vector.begin(), input_vector.end() );
+            // delete later after debug
+            for (auto i: vector_to_read){
+                std::cout << i;
+            }
+            std::cout << std::endl;
+            // 
+            InteractiveMarkovModels[i].fill_with_vector(vector_to_read);
+        }
+    }
+
     void fills(const Tape &tape){
         for(auto i=0u;i<InteractiveMarkovModels.size();++i){
             InteractiveMarkovModels[i].fill(tape);
@@ -177,3 +194,4 @@ struct AllInteractiveMarkovModel{
         std::for_each(std::begin(InteractiveMarkovModels), std::end(InteractiveMarkovModels),update);
     }
 };
+
