@@ -24,6 +24,7 @@ struct Search{
     Args args;
     Loss loss;
     TmId traversal_len;
+    unsigned int seed;
     Search(Args args, double weight);
     
     private:

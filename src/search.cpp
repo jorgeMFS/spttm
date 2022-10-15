@@ -6,7 +6,7 @@
 #include "util.h"
 
 
-Search::Search(Args args, double weight): args(args),loss(args,weight),traversal_len(args.traversal_len){
+Search::Search(Args args, double weight): args(args),loss(args,weight),traversal_len(args.traversal_len), seed(args.sd){
     if (args.traversal_len==0){
         traversal_len=tm_cardinality(args.states, args.alphabet_size);
     }
@@ -72,7 +72,7 @@ std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearch(TmId traver
     StateMatrix st(args.states,args.alphabet_size);
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
     std::random_device rnd_device;
-    std::minstd_rand rng{args.sd};
+    std::minstd_rand rng{seed};
     for (auto counter = 0ull; counter < traversal_length; counter++) {
         st.set_random(rng);
         double loss = test_machine(st,all_models);
@@ -103,9 +103,14 @@ std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearchMulticore() 
     }
 
     works.push_back(std::async([=]() {
-      auto o = MonteCarloSearch(len);
-      return o;
+        std::cerr << "Worker #" << i << " started @ partition ["  <<  len <<  "[" << std::endl;
+        ++seed;
+        std::cerr << "seed =>" << seed<< std::endl;
+        auto o = MonteCarloSearch(len);
+        std::cerr << "Worker #" << i << " finished" << std::endl;
+        return o;
     }));
+    
   }
 
     std::vector<std::pair<StateMatrix, double>> total;
