@@ -19,6 +19,8 @@ void Search::init(){
         throw std::invalid_argument("search_strategy argument can not be null in this program");
     }
     else if (std::strcmp(args.search_strategy, "Sequential")== 0){
+        SequentialSearchMulticore();
+        std::cerr<<"debug"<<std::endl;
         SequentialSearch(traversal_len,0);
     }
     else if(std::strcmp(args.search_strategy, "Monte_Carlo") == 0){
@@ -113,7 +115,7 @@ std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearchMulticore() 
     
   }
 
-    std::vector<std::pair<StateMatrix, double>> total;
+  std::vector<std::pair<StateMatrix, double>> total;
 
   for (auto& f: works) {
     auto r = f.get();
@@ -122,4 +124,44 @@ std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearchMulticore() 
 
   return total; 
 
+}
+
+std::vector<std::pair<StateMatrix, double>> Search::SequentialSearchMulticore(){
+  // split work in partitions
+
+  if (args.jobs > traversal_len) {
+    args.jobs = traversal_len;
+  }
+  
+  auto partition_len = traversal_len / args.jobs;
+  auto partition_rest = traversal_len % args.jobs;
+
+  // spawn  tasks asynchronously
+  std::vector<std::future<std::vector<std::pair<StateMatrix, double>>>> works;
+  for (auto i = 0u; i < args.jobs; ++i) {
+    auto offset = partition_len * i;
+    auto len = partition_len;
+    if (i == args.jobs - 1) {
+      len += partition_rest;
+    }
+
+    works.push_back(std::async([=]() {
+        std::cerr << "Worker #" << i << " started @ partition [" << offset << ", " << (offset + len) <<  "[" << std::endl;
+        auto o = SequentialSearch(len, offset);
+        std::cerr << "Worker #" << i << " finished" << std::endl;
+      return o;
+    }));
+
+  }
+
+  // await and merge results together
+
+  std::vector<std::pair<StateMatrix, double>> total;
+
+  for (auto& f: works) {
+    auto r = f.get();
+    total.insert(end(total), begin(std::move(r)), end(std::move(r)));
+  }
+
+  return total;
 }
