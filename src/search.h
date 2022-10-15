@@ -28,8 +28,11 @@ struct Search{
     
     private:
         void init();
-        void SequentialSearch();
-        void MonteCarloSearch();
+
+        std::vector<std::pair<StateMatrix, double>> SequentialSearchMulticore();
+        std::vector<std::pair<StateMatrix, double>> MonteCarloSearchMulticore();
+        std::vector<std::pair<StateMatrix, double>> SequentialSearch(TmId traversal_length, TmId traversal_offset);
+        std::vector<std::pair<StateMatrix, double>> MonteCarloSearch(TmId traversal_length);
         double test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models);
         //Search
         //MultiCore

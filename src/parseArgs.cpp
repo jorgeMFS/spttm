@@ -32,6 +32,7 @@ Args parseArgs (int argc, char **argv){
             {"traversal_len", optional_argument, 0, 'n'},
             {"context", required_argument, 0, 'k'},
             {"seed",optional_argument,0,'e'},
+            {"jobs",optional_argument,0,'j'},
             {"alpha", required_argument, 0 , 'A'},
             {"number_output_lines", optional_argument, 0, 'o'},
             {"threshold", optional_argument, 0, 'T'},
@@ -44,7 +45,7 @@ Args parseArgs (int argc, char **argv){
         };
         int option_index = 0;
 
-        int c = getopt_long (argc, argv, "e:s:a:A:i:n:o:T:l:k:f:t:N:S:h",
+        int c = getopt_long (argc, argv, "e:s:a:A:i:n:j:o:T:l:k:f:t:N:S:h",
                         long_options, &option_index);
 
         if (c == -1)
@@ -138,6 +139,20 @@ Args parseArgs (int argc, char **argv){
                 exit(0);
             }
             else argument.tape_iterations = correctInput;
+            break;
+        }
+        case 'j':
+            {
+            correctInput = strtol(optarg, &end, 10);
+            if (*end != '\0') {
+                std::cerr << "Invalid input for -j/--jobs.\n";
+                exit(0);
+            }
+            else if (correctInput<=0){
+                std::cerr << "-j/--jobs value was set to " << correctInput <<", must be an int larger than 0.\n";
+                exit(0);
+            }
+            else argument.jobs = correctInput;
             break;
         }
         case 'n':
@@ -334,6 +349,7 @@ Args parseArgs (int argc, char **argv){
 
 void printArgs(Args arguments){
     std::cout<< bold_on << "Seed => " << arguments.sd << bold_off << std::endl;
+     std::cout<< "number of threads => " << arguments.jobs<< std::endl;
     std::cout<< "States => " << arguments.states << std::endl;
     std::cout<< "Alphabet Size => " << arguments.alphabet_size<< std::endl;
     std::cout<< "Tape Iterations => " << arguments.tape_iterations << std::endl;

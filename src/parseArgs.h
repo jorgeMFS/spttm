@@ -16,6 +16,7 @@
 struct Args{
     
     unsigned int sd = 0;
+    unsigned int jobs = 1;
     size_t states = 0;
     size_t alphabet_size = 0;
     unsigned int tape_iterations = 0;
