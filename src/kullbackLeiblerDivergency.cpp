@@ -3,17 +3,18 @@
 #include "read_input.h"
 #include "interactiveMarkovModel.h"
 
-KullbackLeiblerDivergency::KullbackLeiblerDivergency(Args args, bool tm_bool):target(args.target_file, args.alphabet_size),args(args){
-    init(tm_bool);
+KullbackLeiblerDivergency::KullbackLeiblerDivergency(Args args):target(args.target_file, args.alphabet_size),args(args){
+    init();
 }
 
-void KullbackLeiblerDivergency::init(bool tm_bool){
+void KullbackLeiblerDivergency::init(){
 
     ReadInput readtarget(args.target_file);
 
     auto target_vector = readtarget.get_input_vector_as_unsigned_int();
     bool print_bool = false;
-    mk_target_vector = target.get_models(args, target_vector, tm_bool, print_bool);
+    mk_target_vector = target.get_models(args, target_vector , print_bool);
+
 }
 
 void KullbackLeiblerDivergency::run_w_input_file(){
@@ -73,8 +74,8 @@ std::vector<double> KullbackLeiblerDivergency::compute_divergency_p_k_elem(std::
 double KullbackLeiblerDivergency::compute_divergency_pconditional(MarkovTable &mk_input, MarkovTable &mk_target) const{
     unsigned int c_size= pow(mk_input.alphSz,mk_input.get_context());
     //std::cout << c_size << std::endl;
-
     unsigned int alphabet_size= mk_input.alphSz;
+    
     mk_input.normalize(args.lambda);
     mk_target.normalize(args.lambda);
 

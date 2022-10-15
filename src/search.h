@@ -29,6 +29,7 @@ struct Search{
     private:
         void init();
         void SequentialSearch();
+        void MonteCarloSearch();
         double test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models);
         //Search
         //MultiCore

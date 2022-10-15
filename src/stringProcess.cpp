@@ -108,7 +108,7 @@ std::vector<double> StringProcess::readinput(MarkovTable& markovTable) const {
   return nrc_values;
 }
 
-std::vector<MarkovTable> StringProcess::get_models(Args &args,std::vector<unsigned int> &confirmation_vector, bool &tm_bool, bool &print_bool) const{
+std::vector<MarkovTable> StringProcess::get_models(Args &args,std::vector<unsigned int> &confirmation_vector, bool &print_bool) const{
   unsigned int index;
  
   for (auto i=0u; i<transcribed_vectors.size(); ++i){
@@ -121,10 +121,6 @@ std::vector<MarkovTable> StringProcess::get_models(Args &args,std::vector<unsign
       std::cout<<x;
   }
   AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, m_cardinality, args.alpha);
-  if(tm_bool){
-    all_models.fill_with_vector_from_tape(get_transcribed_vector(index),args.k);
-    return all_models.get_markov_tables();
-  }
     all_models.fill_with_vector(get_transcribed_vector(index));
     return all_models.get_markov_tables();
   

@@ -9,7 +9,7 @@ struct loss_weight_exception: public std::exception {
 };
 
 // tm_bool in kl was set to true since we intend to use loss in TMs
-Loss::Loss(Args &args, double &weight):w(weight),kl(args,true){
+Loss::Loss(Args &args, double &weight):w(weight),kl(args){
     if(w>1 | w<0){
         throw loss_weight_exception{};
     }

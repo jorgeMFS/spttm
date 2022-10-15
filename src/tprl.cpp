@@ -97,17 +97,17 @@ void tprl::step_2(Args args){
         b = TMCycleDetector.cycledetector(tm, 50);
     }
     while(b==true);
-    
+    tm.reset_tape_and_state();
     //get NRC or cycle.
     for (auto i = 0u; i < args.tape_iterations; ++i){
         tm.act_rule(); // grave esti antaŭe
     }
 
     auto tp = tm.get_tape().get_tape_vector(0);
-
-    // auto st_m  = st.print_st_matrix_vector();
-    // outFile << st_m;
-    // outFile  << std::endl;
+    std::cout << st.get_state_matrix_string() << std::endl;
+    auto st_m  = st.print_st_matrix_vector();
+    outFile << st_m;
+    outFile  << std::endl;
     for (const auto &el: tp){
         outFile  << el;
     }

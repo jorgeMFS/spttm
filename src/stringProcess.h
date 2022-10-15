@@ -36,7 +36,7 @@ struct StringProcess{
     std::vector<std::vector<unsigned int>> get_all_transcribed_vectors() const;
     std::vector<unsigned int> get_transcribed_vector(unsigned int const & index) const;
     
-    std::vector<MarkovTable> get_models(Args &args, std::vector<unsigned int> &confirmation_vector, bool &tm_bool, bool &print_bool) const;
+    std::vector<MarkovTable> get_models(Args &args, std::vector<unsigned int> &confirmation_vector, bool &print_bool) const;
 
 
     /** Sets new input vector and recalculates normalizer*/    

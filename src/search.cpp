@@ -15,8 +15,7 @@ void Search::init(){
         SequentialSearch();
     }
     else if(std::strcmp(args.search_strategy, "Monte_Carlo") == 0){
-        std::cout << "ERROR ERROR" << std::endl;
-        exit(-1); // fix latter
+        MonteCarloSearch();
     } 
     else if(std::strcmp(args.search_strategy, "Neural_Networks") == 0){
         std::cout << "ERROR ERROR" << std::endl;
@@ -30,23 +29,19 @@ void Search::SequentialSearch(){
     std::vector<std::pair<StateMatrix, double>> tm_data;
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
     StateMatrix st(args.states,args.alphabet_size);
-
     TmId traversal_len = tm_cardinality(args.states, args.alphabet_size);
     
-    unsigned int counter = 0;
+    TmId counter = 0;
     do {
         double loss = test_machine(st,all_models);
         if(loss<args.threshold) {
-            std::cout<< loss <<std::endl;
+            std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
             tm_data.push_back(std::pair<StateMatrix, double>(st, loss));
         } 
         st.next();
         counter += 1;
     } while (counter < traversal_len);
 }
-
-
-
 
 double Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models) {
     
@@ -58,13 +53,52 @@ double Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<Interacti
     }
     std::vector<MarkovTable> mkv_vector=all_models.get_markov_tables();
     double tm_loss = loss.compute_loss(mkv_vector);
-    
-    if(tm_loss<args.threshold){
-        tm.print_written_tape(true);
-        exit(-1);
-    }
     return tm_loss;
 }
+
+void Search::MonteCarloSearch(){
+    std::vector<std::pair<StateMatrix, double>> tm_data;
+    StateMatrix st(args.states,args.alphabet_size);
+    AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
+    std::random_device rnd_device;
+    std::minstd_rand rng{args.sd};
+    TmId traversal_len = tm_cardinality(args.states, args.alphabet_size);
+    for (auto counter = 0ull; counter < traversal_len; counter++) {
+        st.set_random(rng);
+        double loss = test_machine(st,all_models);
+        if(loss<args.threshold) {
+            std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
+            tm_data.push_back(std::pair<StateMatrix, double>(st, loss));
+        } 
+    }
+}
+// case TraversalStrategy::MONTE_CARLO: {
+//             // initialize random number generator
+//             std::random_device rnd_device;
+//             Rng rng{rnd_device()};
+
+//             for (auto counter = 0ull; counter < traversal_len; counter++) {
+//                 machine.stMatrix.set_random(rng);
+//                 //machine.stMatrix.print();
+//                 auto indAndmetrics = test_machine(machine, 
+//                                         bestMkvTableCompression,
+//                                         iteractiveMarkov,
+//                                         num_iterations,
+//                                         strProcess, 
+//                                         threshold.first);
+//                 if (verbose && counter % 4096 == 0) {
+//                 std::cerr << "TM #" << std::setw(8) << indAndmetrics.tmNumber << ": amplitude = " << indAndmetrics.metrics.amplitude 
+//                 << ": sc = " << std::setprecision(5) << std::showpoint <<indAndmetrics.metrics.selfCompression <<": nc = " << std::setprecision(5) << std::showpoint
+//                 << indAndmetrics.metrics.normalizedCompression << "\r";
+//                 }
+                
+//                 // get Turing machine index
+//                  if(indAndmetrics.notZero()) {
+//                     data.append_metrics(indAndmetrics);
+//                 }   
+//             }
+//         }
+//         break;
 
 
 
