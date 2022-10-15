@@ -2,7 +2,10 @@
 #include "search.h"
 #include "util.h"
 
-Search::Search(Args args, double weight): args(args),loss(args,weight){
+Search::Search(Args args, double weight): args(args),loss(args,weight),traversal_len(args.traversal_len){
+    if (args.traversal_len==0){
+        traversal_len=tm_cardinality(args.states, args.alphabet_size);
+    }
     init();
 }
 
@@ -29,7 +32,6 @@ void Search::SequentialSearch(){
     std::vector<std::pair<StateMatrix, double>> tm_data;
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
     StateMatrix st(args.states,args.alphabet_size);
-    TmId traversal_len = tm_cardinality(args.states, args.alphabet_size);
     
     TmId counter = 0;
     do {
@@ -62,7 +64,6 @@ void Search::MonteCarloSearch(){
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
     std::random_device rnd_device;
     std::minstd_rand rng{args.sd};
-    TmId traversal_len = tm_cardinality(args.states, args.alphabet_size);
     for (auto counter = 0ull; counter < traversal_len; counter++) {
         st.set_random(rng);
         double loss = test_machine(st,all_models);
@@ -117,8 +118,6 @@ void Search::MonteCarloSearch(){
  * @return a struct containing the results of evaluation, one per Turing machine
 */
 
-
-
 // CompressionResultsData find_tm(
 //     size_t states,
 //     size_t alphabet_size,
@@ -162,8 +161,7 @@ void Search::MonteCarloSearch(){
 //                 }
 
 //                 if(indAndmetrics.notZero()) {
-//                   data.append_metrics(indAndmetrics);
-                  
+//                   data.append_metrics(indAndmetrics);            
 //                 } 
 
 //                 machine.stMatrix.next();

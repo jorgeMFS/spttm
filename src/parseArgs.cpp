@@ -29,6 +29,7 @@ Args parseArgs (int argc, char **argv){
             {"number_states", optional_argument, 0 , 's'},
             {"alphabet_size", optional_argument, 0, 'a'},
             {"iterations", optional_argument, 0, 'i'},
+            {"traversal_len", optional_argument, 0, 'n'},
             {"context", required_argument, 0, 'k'},
             {"seed",optional_argument,0,'e'},
             {"alpha", required_argument, 0 , 'A'},
@@ -43,7 +44,7 @@ Args parseArgs (int argc, char **argv){
         };
         int option_index = 0;
 
-        int c = getopt_long (argc, argv, "e:s:a:A:i:o:T:l:k:f:t:N:S:h",
+        int c = getopt_long (argc, argv, "e:s:a:A:i:n:o:T:l:k:f:t:N:S:h",
                         long_options, &option_index);
 
         if (c == -1)
@@ -138,6 +139,18 @@ Args parseArgs (int argc, char **argv){
             }
             else argument.tape_iterations = correctInput;
             break;
+        }
+        case 'n':
+            {
+                    {
+            auto parsed = strtoull(optarg, &end, 10);
+            if (*end != '\0') {
+                std::cerr << "Invalid input for -N.\n";
+                exit(0);
+            }
+            argument.traversal_len = parsed;
+            break;
+        }
         }
         case 'N':
             {
@@ -324,6 +337,7 @@ void printArgs(Args arguments){
     std::cout<< "States => " << arguments.states << std::endl;
     std::cout<< "Alphabet Size => " << arguments.alphabet_size<< std::endl;
     std::cout<< "Tape Iterations => " << arguments.tape_iterations << std::endl;
+    std::cout<< "Traversal Length => " << arguments.traversal_len << std::endl;
     std::cout<< "Input file => " << arguments.input_file << std::endl;
     std::cout<< "Target file => " << arguments.target_file << std::endl;
     std::cout<< "Number of files => " << arguments.n_files << std::endl;

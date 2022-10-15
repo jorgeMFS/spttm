@@ -8,9 +8,7 @@ KullbackLeiblerDivergency::KullbackLeiblerDivergency(Args args):target(args.targ
 }
 
 void KullbackLeiblerDivergency::init(){
-
     ReadInput readtarget(args.target_file);
-
     auto target_vector = readtarget.get_input_vector_as_unsigned_int();
     bool print_bool = false;
     mk_target_vector = target.get_models(args, target_vector , print_bool);
@@ -75,7 +73,7 @@ double KullbackLeiblerDivergency::compute_divergency_pconditional(MarkovTable &m
     unsigned int c_size= pow(mk_input.alphSz,mk_input.get_context());
     //std::cout << c_size << std::endl;
     unsigned int alphabet_size= mk_input.alphSz;
-    
+
     mk_input.normalize(args.lambda);
     mk_target.normalize(args.lambda);
 

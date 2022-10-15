@@ -22,7 +22,6 @@ struct Args{
     std::vector <unsigned int> k;
     double alpha = 1;
     double lambda = 1;
-    TmId n = 0;
     unsigned int c = 0;
     std::string input_file ="";
     std::string target_file ="";
@@ -30,6 +29,7 @@ struct Args{
     unsigned int num_out_lines=0;
     double threshold=0.1;
     const char * search_strategy = "Null";
+    TmId traversal_len=0;
 };
 
 void help();

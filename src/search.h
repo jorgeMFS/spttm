@@ -23,7 +23,7 @@ struct Search{
     
     Args args;
     Loss loss;
-    
+    TmId traversal_len;
     Search(Args args, double weight);
     
     private:
