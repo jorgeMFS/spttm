@@ -1,3 +1,17 @@
+/**
+    loss.h
+    Purpose: Computes loss.
+    Weight parameter define computations.
+    Weight = 1, only computes Kullback–Leibler divergence conditional probabilities.
+    Weight = 0, only computes Kullback–Leibler divergence probability of k+1 elements.
+    Weight =]0,1[ does both, with weighted average.
+
+    @author Jorge Miguel Ferreira da Silva
+    @version 0.1
+*/
+
+
+#pragma once
 
 #include "kullbackLeiblerDivergency.h"
 

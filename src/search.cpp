@@ -1,6 +1,7 @@
 
 #include <future>
 #include <thread>
+#include <unordered_set>
 
 #include "search.h"
 #include "util.h"
@@ -20,8 +21,7 @@ void Search::init(){
     }
     else if (std::strcmp(args.search_strategy, "Sequential")== 0){
         SequentialSearchMulticore();
-        std::cerr<<"debug"<<std::endl;
-        SequentialSearch(traversal_len,0);
+
     }
     else if(std::strcmp(args.search_strategy, "Monte_Carlo") == 0){
        MonteCarloSearchMulticore();
@@ -37,9 +37,9 @@ std::vector<std::pair<StateMatrix, double>> Search::SequentialSearch(TmId traver
     //stored data;
     std::vector<std::pair<StateMatrix, double>> tm_data;
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
+    
     StateMatrix st(args.states,args.alphabet_size);
     TmId counter = 0;
-    
     if (traversal_offset > 0) {
                 st.set_by_index(traversal_offset);
     }
@@ -49,6 +49,8 @@ std::vector<std::pair<StateMatrix, double>> Search::SequentialSearch(TmId traver
         if(loss<args.threshold) {
             std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
             tm_data.push_back(std::pair<StateMatrix, double>(st, loss));
+            std::cerr<< st.get_state_matrix_string()<<std::endl;
+
         } 
         st.next();
         counter += 1;
@@ -60,26 +62,36 @@ double Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<Interacti
     
     TuringMachine tm(st);
     all_models.reset();
-    for (auto i = 0u; i < args.tape_iterations -1 ; ++i){
+    for (auto i = 0u; i < args.tape_iterations ; ++i){
         TapeMoves tpMove = tm.act(); // grave esti antaŭe
         all_models.update_tables(tpMove, tm.turingTape);
     }
     std::vector<MarkovTable> mkv_vector=all_models.get_markov_tables();
-    double tm_loss = loss.compute_loss(mkv_vector);
-    return tm_loss;
+    return loss.compute_loss(mkv_vector);
 }
 
 std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearch(TmId traversal_length){
     std::vector<std::pair<StateMatrix, double>> tm_data;
     StateMatrix st(args.states,args.alphabet_size);
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
-    std::random_device rnd_device;
+    auto rd_dev = std::random_device{};
     std::minstd_rand rng{seed};
+    std::seed_seq seq{rd_dev(), rd_dev(), rd_dev(), rd_dev()};
+    std::mt19937 urbg(seq);
+    std::unordered_set<std::string> st_matrix;
+
+    bool entry=false;
     for (auto counter = 0ull; counter < traversal_length; counter++) {
-        st.set_random(rng);
+        do{
+            st.set_random(urbg);
+            entry = st_matrix.insert(st.get_state_matrix_string()).second;
+        }
+        while(entry==false);
         double loss = test_machine(st,all_models);
+
         if(loss<args.threshold) {
             std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
+            std::cerr<< st.get_state_matrix_string()<<std::endl;
             tm_data.push_back(std::pair<StateMatrix, double>(st, loss));
         } 
     }
@@ -106,7 +118,7 @@ std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearchMulticore() 
 
     works.push_back(std::async([=]() {
         std::cerr << "Worker #" << i << " started @ partition ["  <<  len <<  "[" << std::endl;
-        ++seed;
+        seed = (prime * seed) % 4079;
         std::cerr << "seed =>" << seed<< std::endl;
         auto o = MonteCarloSearch(len);
         std::cerr << "Worker #" << i << " finished" << std::endl;

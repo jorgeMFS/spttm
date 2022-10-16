@@ -94,6 +94,17 @@ TuringRecord set_random(Rng &rng,unsigned int number_of_states, unsigned int alp
   return tr;
 }
 
+void StateMatrix::set_by_index(TmId id) {
+  auto rest = id;
+  auto record_cardinality = this->nbStates * this->alphSz * 3;
+  for (auto& st: this->v) {
+    auto state_id = rest % record_cardinality;
+    st = TuringRecord::by_index(state_id, this->nbStates, this->alphSz);
+    rest /= record_cardinality;
+    if (rest == 0) break;
+  }
+}
+
 //-----------------------------------------------------------------------------
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////STATE MATRIX////////////////////////////////////////////////////////////////////////////////////
@@ -267,19 +278,6 @@ double StateMatrix::similarity(StateMatrix st2){
       }
     }
     return in_common_rules/total_rules;
-}
-
-
-
-void StateMatrix::set_by_index(TmId id) {
-  auto rest = id;
-  auto record_cardinality = this->nbStates * this->alphSz * 3;
-  for (auto& st: this->v) {
-    auto state_id = rest % record_cardinality;
-    st = TuringRecord::by_index(state_id, this->nbStates, this->alphSz);
-    rest /= record_cardinality;
-    if (rest == 0) break;
-  }
 }
 
 TmId StateMatrix::calculate_index() const {

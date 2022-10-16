@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <unordered_set>
+
 #include "turingMachine.h"
 #include "markovTable.h"
 #include "parseArgs.h"

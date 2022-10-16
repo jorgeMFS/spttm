@@ -8,7 +8,7 @@
 
 #include <fstream>
 #include <string>
-#include <unordered_set>
+
 #include "interactiveMarkovModel.h"
 #include "tprl.h"
 #include "turingMachine.h"
@@ -117,6 +117,7 @@ void tprl::step_2(Args args){
         }
     }
     while(new_entry==false);
+
     auto tp = tm.get_tape().get_tape_vector(0);
     std::cerr << bold_on << green_on << file <<": "<< bold_off << red_on  << st.get_state_matrix_string() << bold_off << std::endl;
     for (const auto &el: tp){

@@ -26,6 +26,8 @@ struct Search{
     Loss loss;
     TmId traversal_len;
     unsigned int seed;
+    unsigned int prime = 65519;
+
     Search(Args args, double weight);
     
     private:
