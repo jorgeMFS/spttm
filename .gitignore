@@ -39,3 +39,4 @@ tapeTestPool/*
 #json
 .vscode/settings.json
 A_0
+.DS_Store
