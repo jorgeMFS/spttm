@@ -8,7 +8,7 @@
 
 #include <fstream>
 #include <string>
-
+#include <unordered_set>
 #include "interactiveMarkovModel.h"
 #include "tprl.h"
 #include "turingMachine.h"
@@ -44,17 +44,21 @@ void tprl::step(Args args){
     TuringMachine tm(st);
    
     TMCycleDetector TMCycleDetector;
-    auto b = TMCycleDetector.cycledetector(tm, 100);
+    bool b=true;
     
+
     do {
+        if(detector_counter<ULLONG_MAX){
+            if((++detector_counter%1000==0) & (less_dect < 80)) {
+                ++less_dect;
+            }
+        }
         st.set_random(rng);
         st.print_st_matrix_vector();
         tm.set_tm(st);
-        b = TMCycleDetector.cycledetector(tm, 50);
+        b = TMCycleDetector.cycledetector(tm,  100-less_dect);
     }
     while(b==true);
-    
-    //get NRC or cycle.
     for (auto i = 0u; i < args.tape_iterations; ++i){
         auto tuple_tp_rule = tm.act_rule(); // grave esti antaŭe
         tpMove = std::get<0>(tuple_tp_rule);
@@ -90,24 +94,35 @@ void tprl::step_2(Args args){
     st.set_random(rng);
     TuringMachine tm(st);
    
+    bool new_entry;
     TMCycleDetector TMCycleDetector;
-    auto b = TMCycleDetector.cycledetector(tm, 100);
+    bool b= true;
     
     do {
+        if(detector_counter<ULLONG_MAX){
+            if((++detector_counter%1000==0) & (less_dect < 80)) {
+                ++less_dect;
+            }
+        }
+        new_entry = false;
         st.set_random(rng);
         tm.set_tm(st);
-        b = TMCycleDetector.cycledetector(tm, 50);
+        b = TMCycleDetector.cycledetector(tm, 100-less_dect);
+        if (b==false){
+            tm.reset_tape_and_state();
+            for (auto i = 0u; i < args.tape_iterations; ++i){
+                tm.act_rule(); // grave esti antaŭe
+            }
+            new_entry = tm_created.insert(tm.get_tape().print_written_tape(false)).second;
+        }
     }
-    while(b==true);
-    tm.reset_tape_and_state();
-    //get NRC or cycle.
-    for (auto i = 0u; i < args.tape_iterations; ++i){
-        tm.act_rule(); // grave esti antaŭe
-    }
-
+    while(new_entry==false);
     auto tp = tm.get_tape().get_tape_vector(0);
     std::cerr << bold_on << green_on << file <<": "<< bold_off << red_on  << st.get_state_matrix_string() << bold_off << std::endl;
     for (const auto &el: tp){
         outFile  << el;
     }
 }
+
+
+    

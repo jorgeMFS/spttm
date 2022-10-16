@@ -24,6 +24,9 @@ struct tprl{
     unsigned int input_amplitude;
     unsigned int counter;
     std::vector<double> per_elem_input;
+    std::unordered_set<std::string> tm_created;
+    unsigned long long detector_counter=0;
+    unsigned int less_dect=0;
     StateMatrix st;
     std::minstd_rand rng;
 
