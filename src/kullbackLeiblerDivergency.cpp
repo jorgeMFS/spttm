@@ -9,6 +9,7 @@ KullbackLeiblerDivergency::KullbackLeiblerDivergency(Args args):target(args.targ
 
 void KullbackLeiblerDivergency::init(){
     ReadInput readtarget(args.target_file);
+    readtarget.printData();
     auto target_vector = readtarget.get_input_vector_as_unsigned_int();
     bool print_bool = false;
     mk_target_vector = target.get_models(args, target_vector , print_bool);

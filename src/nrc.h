@@ -1,3 +1,11 @@
+/**
+    nrc.h
+    Purpose: Computes NRC.
+
+    @author Jorge Miguel Ferreira da Silva
+    @version 0.1
+*/
+
 #pragma once
 
 #include "parseArgs.h"

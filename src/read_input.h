@@ -1,3 +1,10 @@
+/**
+    read_input.h
+    Purpose: Read files provided into vector (unsigned int or chars).
+    
+    @author Jorge Miguel Ferreira da Silva
+    @version 0.1
+*/
 
 #pragma once
 

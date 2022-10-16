@@ -1,4 +1,13 @@
+/**
+    tmId.h
+    Purpose: Int of 128 bits.
+
+    @author Jorge Miguel Ferreira da Silva
+    @version 0.1
+*/
+
 #pragma once
+
 #include <iostream>
 
 #ifdef __SIZEOF_INT128__

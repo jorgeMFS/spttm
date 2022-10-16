@@ -1,3 +1,14 @@
+/**
+    loss.h
+    Purpose: Produces TMs without loops. Has 2 modes.
+    Mode Y) Produces file with TM rule matrix, rules index used in each iteration, tapes produces after n iterations,
+    and position tm is in each iterations.
+    Mode N) Produces TM tape after n iteration, cerr the tm matrix.
+    
+    @author Jorge Miguel Ferreira da Silva
+    @version 0.1
+*/
+
 
 #pragma once
 

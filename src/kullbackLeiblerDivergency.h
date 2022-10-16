@@ -1,5 +1,5 @@
 /**
-    compute_nrc.cpp
+    kullbackLeiblerDivergency.h
     Purpose: Computes Kullback–Leibler divergence:
     Mode A) Conditional Probabilities of Markov Models
     Mode B) Probability of k+1 elements.

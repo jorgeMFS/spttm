@@ -2,7 +2,7 @@
 #include <fstream>
 
 #include "read_input.h"
-
+#include "util.h"
 
 ReadInput::ReadInput(std::string filename):vecOfchrs(){
         getFileContent(filename);
@@ -34,10 +34,11 @@ void ReadInput::getFileContent(std::string fileName){
 }
 
 void ReadInput::printData() const {   
+    std::cerr <<bold_on << green_on << "Data :" << bold_off << std::endl;
     for (auto elem:vecOfchrs){
-        std::cout<< elem;
+        std::cerr<<bold_on << cyan_on << elem << bold_off << ' ';
     }
-    std::cout<< std::endl;
+    std::cerr<< std::endl;
 }
 
 std::vector<char> ReadInput::get_input_vector() const{

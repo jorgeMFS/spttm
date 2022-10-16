@@ -6,11 +6,13 @@
     @version 0.1
 */
 
-#include "tprl.h"
-#include "interactiveMarkovModel.h"
-#include "turingMachine.h"
 #include <fstream>
 #include <string>
+
+#include "interactiveMarkovModel.h"
+#include "tprl.h"
+#include "turingMachine.h"
+#include"util.h"
 
 
 tprl::tprl(Args args, bool print_all_bool):print_all_bool(print_all_bool),counter(0),st(args.states, args.alphabet_size),rng{args.sd}{
@@ -104,10 +106,7 @@ void tprl::step_2(Args args){
     }
 
     auto tp = tm.get_tape().get_tape_vector(0);
-    std::cout << st.get_state_matrix_string() << std::endl;
-    auto st_m  = st.print_st_matrix_vector();
-    outFile << st_m;
-    outFile  << std::endl;
+    std::cerr << bold_on << green_on << file <<": "<< bold_off << red_on  << st.get_state_matrix_string() << bold_off << std::endl;
     for (const auto &el: tp){
         outFile  << el;
     }
