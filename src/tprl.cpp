@@ -6,6 +6,8 @@
     @version 0.1
 */
 
+#include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <string>
 
@@ -33,7 +35,11 @@ tprl::tprl(Args args, bool print_all_bool):print_all_bool(print_all_bool),counte
 
 
 void tprl::step(Args args){
-    std::string file = "./dataset/"+args.input_file+"_"+std::to_string(++counter);
+    auto alphabet_subfolder=std::to_string(args.alphabet_size);
+    auto state_subfolder=std::to_string(args.states);
+    std::string path = "dataset/"+alphabet_subfolder+"/"+state_subfolder+"/";
+    std::filesystem::create_directories(path);
+    std::string file = path + args.input_file+"_"+std::to_string(++counter);
     std::ofstream outFile(file);
     
     TapeMoves tpMove;
@@ -87,7 +93,11 @@ void tprl::step(Args args){
 }
 
 void tprl::step_2(Args args){
-    std::string file = "./tapeTestPool/"+args.input_file+"_"+std::to_string(++counter);
+    auto alphabet_subfolder=std::to_string(args.alphabet_size);
+    auto state_subfolder=std::to_string(args.states);
+    std::string path = "tapeTestPool/"+alphabet_subfolder+"/"+state_subfolder+"/";
+    std::filesystem::create_directories(path);
+    std::string file = path + args.input_file+"_"+std::to_string(++counter);
     std::ofstream outFile(file);
     
     std::vector<std::vector<Char>> tapes;
