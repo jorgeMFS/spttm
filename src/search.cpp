@@ -50,11 +50,14 @@ std::vector<std::pair<StateMatrix, double>> Search::SequentialSearch(TmId traver
             std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
             tm_data.push_back(std::pair<StateMatrix, double>(st, loss));
             std::cerr<< st.get_state_matrix_string()<<std::endl;
-
+            if(loss==0){
+                found_program=true;
+                return tm_data;
+            }
         } 
         st.next();
         counter += 1;
-    } while (counter < traversal_length);
+    } while ((counter < traversal_length) & (found_program==false));
     return tm_data;
 }
 
@@ -74,25 +77,40 @@ std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearch(TmId traver
     std::vector<std::pair<StateMatrix, double>> tm_data;
     StateMatrix st(args.states,args.alphabet_size);
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
-    auto rd_dev = std::random_device{};
-    std::minstd_rand rng{seed};
-    std::seed_seq seq{rd_dev(), rd_dev(), rd_dev(), rd_dev()};
-    std::mt19937 urbg(seq);
-    std::unordered_set<std::string> st_matrix;
 
+    std::unordered_set<std::string> st_matrix;
     bool entry=false;
+
+    auto rd_dev = std::random_device{};
+    std::seed_seq seq{rd_dev(), rd_dev(), rd_dev(), rd_dev()};
+    std::mt19937 rng(seq);
+
+    if (seed>0){
+        std::minstd_rand rng{seed};
+    }
+
     for (auto counter = 0ull; counter < traversal_length; counter++) {
+        if(found_program){
+            return tm_data;
+        }
+
         do{
-            st.set_random(urbg);
+            st.set_random(rng);
             entry = st_matrix.insert(st.get_state_matrix_string()).second;
         }
         while(entry==false);
+        
+        
         double loss = test_machine(st,all_models);
 
         if(loss<args.threshold) {
             std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
             std::cerr<< st.get_state_matrix_string()<<std::endl;
             tm_data.push_back(std::pair<StateMatrix, double>(st, loss));
+            if(loss==0){
+                found_program=true;
+                return tm_data;
+            }
         } 
     }
     return tm_data;
