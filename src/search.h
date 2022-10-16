@@ -27,6 +27,7 @@ struct Search{
     TmId traversal_len;
     unsigned int seed;
     bool found_program=false;
+    unsigned int file_counter=0;
     unsigned int prime = 65519;
 
     Search(Args args, double weight);
@@ -39,6 +40,8 @@ struct Search{
         std::vector<std::pair<StateMatrix, double>> SequentialSearch(TmId traversal_length, TmId traversal_offset);
         std::vector<std::pair<StateMatrix, double>> MonteCarloSearch(TmId traversal_length);
         double test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models);
+
+        void write_to_file(std::vector<std::pair<StateMatrix, double>> results);
 
 };
 

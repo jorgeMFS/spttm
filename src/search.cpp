@@ -1,5 +1,6 @@
 
 #include <future>
+#include <fstream>
 #include <thread>
 #include <unordered_set>
 
@@ -15,21 +16,22 @@ Search::Search(Args args, double weight): args(args),loss(args,weight),traversal
 }
 
 void Search::init(){
-
+    std::vector<std::pair<StateMatrix, double>> results;
     if (std::strcmp(args.search_strategy, "Null") == 0){
         throw std::invalid_argument("search_strategy argument can not be null in this program");
     }
     else if (std::strcmp(args.search_strategy, "Sequential")== 0){
-        SequentialSearchMulticore();
+        results = SequentialSearchMulticore();
 
     }
     else if(std::strcmp(args.search_strategy, "Monte_Carlo") == 0){
-       MonteCarloSearchMulticore();
+       results = MonteCarloSearchMulticore();
     } 
     else if(std::strcmp(args.search_strategy, "Neural_Networks") == 0){
         std::cout << "ERROR ERROR" << std::endl;
         exit(-1); // fix latter
     }
+    write_to_file(results);
 }
 
 std::vector<std::pair<StateMatrix, double>> Search::SequentialSearch(TmId traversal_length, TmId traversal_offset){
@@ -194,4 +196,17 @@ std::vector<std::pair<StateMatrix, double>> Search::SequentialSearchMulticore(){
   }
 
   return total;
+}
+
+
+void Search::write_to_file(std::vector<std::pair<StateMatrix, double>> results){
+    auto alphabet_subfolder=std::to_string(args.alphabet_size);
+    auto state_subfolder=std::to_string(args.states);
+    std::string file = "./results/"+alphabet_subfolder+"/"+state_subfolder+"/"+args.input_file+"_"+std::to_string(++file_counter);
+    std::ofstream outFile(file);
+
+    for (auto &el: results){
+        outFile  << el.first.get_state_matrix_string() << "\t" << el.second << std::endl;
+    }
+
 }
