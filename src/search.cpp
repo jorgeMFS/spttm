@@ -202,7 +202,9 @@ std::vector<std::pair<StateMatrix, double>> Search::SequentialSearchMulticore(){
 void Search::write_to_file(std::vector<std::pair<StateMatrix, double>> results){
     auto alphabet_subfolder=std::to_string(args.alphabet_size);
     auto state_subfolder=std::to_string(args.states);
-    std::string file = "./results/"+alphabet_subfolder+"/"+state_subfolder+"/"+args.input_file+"_"+std::to_string(++file_counter);
+    std::string path = "results/"+alphabet_subfolder+"/"+state_subfolder+"/";
+    std::filesystem::create_directories(path);
+    std::string file = path + args.input_file+"_"+std::to_string(++file_counter);
     std::ofstream outFile(file);
 
     for (auto &el: results){
