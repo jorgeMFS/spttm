@@ -20,10 +20,14 @@ Flags to run code:
 -o: number of output lines per run
 -N: number of files
 -T: nrc threshold
--S: search mode (sequential, monte carlo and neural networks)
+-l: lambda for Kld
+-t: target file
+-S: search mode [sequential (S), monte carlo (M) and neural networks (N)]
+-n: max. number of machines to test
+-j: number of threads
 ```
   
-Example of runing sptm:
+Example of running sptm:
 ```
 ./sptm   -e 555 -s 2 -a 2 -i 100 -A 20 -k 2 -f "A" -o 20
 ```
@@ -59,22 +63,22 @@ E.g.
 1.88525 0.419048        0.639344        3.48925e+10     0.362538        0.0680838
 ```
 
-Example of runing tprl:
+Example of running tprl:
 ```
 ./tprl   -e 555 -s 2 -a 2 -i 100 -A 20 -k 2 -f "A" -o 20 -N 10000
 ```
 
 Outputs: files in dataset folder
 
-Example of runing nrc:
+Example of running nrc:
 ```
 ./nrc -a 2  -A 1 -k 2:9 -f "tapes/A" -t "tapes/B"
 ```
 
 
-Example of runing spark:
+Example of running spark:
 ```
-./spark   -e 777 -s 4 -a 2 -i 1000 -l 0.001 -k 2:3 -T 0 -S S -t "tapeTestPool/A_1"
+./spark -s 4 -a 2 -i 1000 -l 0.001 -k 2:3 -T 0 -S S -t "tapeTestPool/A_1" -N 1000000
 ```
 
 
