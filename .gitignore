@@ -35,8 +35,9 @@
 dataset/*
 tapes/*
 tapeTestPool/*
+results/*
 
 #json
 .vscode/settings.json
-A_0
 .DS_Store
+A_0
