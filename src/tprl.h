@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "turingMachine.h"
 #include "markovTable.h"
 #include "parseArgs.h"

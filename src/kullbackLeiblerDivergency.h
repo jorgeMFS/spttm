@@ -8,6 +8,8 @@
     @version 0.1
 */
 
+#pragma once
+
 #include "parseArgs.h"
 #include "stringProcess.h"
 #include "markovTable.h"

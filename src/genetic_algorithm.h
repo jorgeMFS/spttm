@@ -7,12 +7,15 @@
 */
 // This is it, is the do or die, its 
 
+#pragma once
+
 #include <set>
 #include <vector>
 #include "stringProcess.h"
 // #include "cost.h"
 #include "parseArgs.h"
 // #include "complex_tm.h"
+
 
 
 struct compare_pair_NRC{

@@ -6,6 +6,7 @@
     @version 0.1
 */
 
+#pragma once
 #include <vector>
 #include "parseArgs.h"
 #include "stringProcess.h"

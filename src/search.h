@@ -14,6 +14,7 @@
     @version 0.1
 */
 
+#pragma once
 
 #include "interactiveMarkovModel.h"
 #include "parseArgs.h"

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "parseArgs.h"
 #include "stringProcess.h"
 

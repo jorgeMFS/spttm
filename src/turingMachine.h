@@ -7,6 +7,7 @@
 */
 
 #pragma once
+
 #include <tuple>
 #include <random>
 #include <vector>
