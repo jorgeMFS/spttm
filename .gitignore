@@ -41,3 +41,4 @@ results/*
 .vscode/settings.json
 .DS_Store
 A_0
+src_python_tests/__pycache__/config.cpython-310.pyc
