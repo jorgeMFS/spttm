@@ -15,6 +15,8 @@ from config import TAPE_ITERATIONS,K_INIT,K_LAST,ALPHA,LAMBDA,THRESHOLD,THREADS,
 #Paths
 working_dir="../"
 
+#Variable
+SEARCH_MODE=["S","M"]
 
 def _initialize():
     os.chdir(working_dir)
@@ -26,7 +28,8 @@ def _initialize():
             path = "tapeTestPool/"+str(alphabet)+"/"+str(state)+"/";           
             for filename in os.listdir(path):
                 f = os.path.join(path, filename)
-                os.system(f'./spark   -s {state} -a {alphabet} -A {ALPHA} -i {TAPE_ITERATIONS} -l {LAMBDA} -k {K_INIT}:{K_LAST} -T {THRESHOLD} -S {SEARCH_MODE} -t {f} -j {THREADS} -n {MACHINES_TO_RUN}')
+                for searchMode in SEARCH_MODE:
+                    os.system(f'./spark   -s {state} -a {alphabet} -A {ALPHA} -i {TAPE_ITERATIONS} -l {LAMBDA} -k {K_INIT}:{K_LAST} -T {THRESHOLD} -S {searchMode} -t {f} -j {THREADS} -n {MACHINES_TO_RUN}')
                 
 def main():
     _initialize()
