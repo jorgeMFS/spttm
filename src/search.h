@@ -20,6 +20,8 @@
 #include "parseArgs.h"
 #include "loss.h"
 
+#include <unordered_map>
+
 struct Search{
     
     Args args;
@@ -35,13 +37,13 @@ struct Search{
     private:
         void init();
 
-        std::vector<std::pair<StateMatrix, double>> SequentialSearchMulticore();
-        std::vector<std::pair<StateMatrix, double>> MonteCarloSearchMulticore();
-        std::vector<std::pair<StateMatrix, double>> SequentialSearch(TmId traversal_length, TmId traversal_offset);
-        std::vector<std::pair<StateMatrix, double>> MonteCarloSearch(TmId traversal_length);
+        std::unordered_map<std::string, double> SequentialSearchMulticore();
+        std::unordered_map<std::string, double> MonteCarloSearchMulticore();
+        std::vector<std::pair<std::string, double>> SequentialSearch(TmId traversal_length, TmId traversal_offset);
+        std::vector<std::pair<std::string, double>> MonteCarloSearch(TmId traversal_length);
         double test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models);
 
-        void write_to_file(std::vector<std::pair<StateMatrix, double>> results);
+        void write_to_file(std::unordered_map<std::string, double> results);
 
 };
 

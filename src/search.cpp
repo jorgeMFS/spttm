@@ -4,6 +4,7 @@
 #include <thread>
 #include <unordered_set>
 
+
 #include "search.h"
 #include "util.h"
 
@@ -16,7 +17,7 @@ Search::Search(Args args, double weight): args(args),loss(args,weight),traversal
 }
 
 void Search::init(){
-    std::vector<std::pair<StateMatrix, double>> results;
+    std::unordered_map<std::string, double> results;
     if (std::strcmp(args.search_strategy, "Null") == 0){
         throw std::invalid_argument("search_strategy argument can not be null in this program");
     }
@@ -34,10 +35,10 @@ void Search::init(){
     write_to_file(results);
 }
 
-std::vector<std::pair<StateMatrix, double>> Search::SequentialSearch(TmId traversal_length, TmId traversal_offset){
+std::vector<std::pair<std::string, double>> Search::SequentialSearch(TmId traversal_length, TmId traversal_offset){
 
     //stored data;
-    std::vector<std::pair<StateMatrix, double>> tm_data;
+    std::vector<std::pair<std::string, double>> tm_data;
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
     
     StateMatrix st(args.states,args.alphabet_size);
@@ -50,7 +51,7 @@ std::vector<std::pair<StateMatrix, double>> Search::SequentialSearch(TmId traver
         double loss = test_machine(st,all_models);
         if(loss<args.threshold) {
             std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
-            tm_data.push_back(std::pair<StateMatrix, double>(st, loss));
+            tm_data.push_back(std::pair<std::string, double>(st.get_state_matrix_string(), loss));
             std::cerr<< st.get_state_matrix_string()<<std::endl;
             if(loss==0){
                 found_program=true;
@@ -75,8 +76,8 @@ double Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<Interacti
     return loss.compute_loss(mkv_vector);
 }
 
-std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearch(TmId traversal_length){
-    std::vector<std::pair<StateMatrix, double>> tm_data;
+std::vector<std::pair<std::string, double>> Search::MonteCarloSearch(TmId traversal_length){
+    std::vector<std::pair<std::string, double>> tm_data;
     StateMatrix st(args.states,args.alphabet_size);
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
 
@@ -108,7 +109,7 @@ std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearch(TmId traver
         if(loss<args.threshold) {
             std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
             std::cerr<< st.get_state_matrix_string()<<std::endl;
-            tm_data.push_back(std::pair<StateMatrix, double>(st, loss));
+            tm_data.push_back(std::pair<std::string, double>(st.get_state_matrix_string(), loss));
             if(loss==0){
                 found_program=true;
                 return tm_data;
@@ -118,7 +119,7 @@ std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearch(TmId traver
     return tm_data;
 }
 
-std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearchMulticore() {
+std::unordered_map<std::string, double> Search::MonteCarloSearchMulticore() {
   
   // split work in partitions
   if (args.jobs > traversal_len) {
@@ -129,7 +130,7 @@ std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearchMulticore() 
   auto partition_rest = traversal_len % args.jobs;
 
   // spawn  tasks asynchronously
-  std::vector<std::future<std::vector<std::pair<StateMatrix, double>>>> works;
+  std::vector<std::future<std::vector<std::pair<std::string, double>>>> works;
   for (auto i = 0u; i < args.jobs; ++i) {
     auto len = partition_len;
     if (i == args.jobs - 1) {
@@ -147,18 +148,22 @@ std::vector<std::pair<StateMatrix, double>> Search::MonteCarloSearchMulticore() 
     
   }
 
-  std::vector<std::pair<StateMatrix, double>> total;
+  std::vector<std::pair<std::string, double>> total;
 
   for (auto& f: works) {
     auto r = f.get();
     total.insert(end(total), begin(std::move(r)), end(std::move(r)));
   }
 
-  return total; 
+  std::unordered_map<std::string, double> unordered_map;
+    for(auto &pair:total){
+        unordered_map.insert (pair);
+    }
+  return unordered_map;
 
 }
 
-std::vector<std::pair<StateMatrix, double>> Search::SequentialSearchMulticore(){
+std::unordered_map<std::string, double> Search::SequentialSearchMulticore(){
   // split work in partitions
 
   if (args.jobs > traversal_len) {
@@ -169,7 +174,7 @@ std::vector<std::pair<StateMatrix, double>> Search::SequentialSearchMulticore(){
   auto partition_rest = traversal_len % args.jobs;
 
   // spawn  tasks asynchronously
-  std::vector<std::future<std::vector<std::pair<StateMatrix, double>>>> works;
+  std::vector<std::future<std::vector<std::pair<std::string, double>>>> works;
   for (auto i = 0u; i < args.jobs; ++i) {
     auto offset = partition_len * i;
     auto len = partition_len;
@@ -188,27 +193,30 @@ std::vector<std::pair<StateMatrix, double>> Search::SequentialSearchMulticore(){
 
   // await and merge results together
 
-  std::vector<std::pair<StateMatrix, double>> total;
+  std::vector<std::pair<std::string, double>> total;
 
   for (auto& f: works) {
     auto r = f.get();
     total.insert(end(total), begin(std::move(r)), end(std::move(r)));
   }
-
-  return total;
+    std::unordered_map<std::string, double> unordered_map;
+    for(auto &pair:total){
+        unordered_map.insert (pair);
+    }
+  return unordered_map;
 }
 
 
-void Search::write_to_file(std::vector<std::pair<StateMatrix, double>> results){
+
+void Search::write_to_file(std::unordered_map<std::string, double> results){
     auto alphabet_subfolder=std::to_string(args.alphabet_size);
     auto state_subfolder=std::to_string(args.states);
-    std::string path = "results/"+alphabet_subfolder+"/"+state_subfolder+"/";
+    auto search_mode_subfolder=args.search_strategy;
+    std::string path = "results/"+alphabet_subfolder+"/"+state_subfolder+"/"+search_mode_subfolder+"/";
     std::filesystem::create_directories(path);
     std::string file = path + args.input_file+"_"+std::to_string(++file_counter);
     std::ofstream outFile(file);
-
     for (auto &el: results){
-        outFile  << el.first.get_state_matrix_string() << "\t" << el.second << std::endl;
+        outFile  << el.first << "\t" << el.second << std::endl;
     }
-
 }
