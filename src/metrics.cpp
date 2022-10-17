@@ -27,6 +27,7 @@ Metrics set_default(){
     averageOfMetrics.k=2;
     averageOfMetrics.normalizedCompression=0.5;
     averageOfMetrics.selfCompression=154;
+    return averageOfMetrics;
 }
 
 Metrics averageMetrics(std::vector<Metrics> metricsVec){

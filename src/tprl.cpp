@@ -35,7 +35,7 @@ tprl::tprl(Args args, bool print_all_bool):print_all_bool(print_all_bool),counte
         auto cnt=0u;
         auto files_per_slot=args.n_files/10;
         unsigned long long value_division=args.traversal_len / 10;
-        while ( (i <= args.n_files) & (number_iterations<=args.traversal_len) & (nc_min<0.9)  ){
+        while ( (i <= args.n_files) && (number_iterations<=args.traversal_len) && (nc_min<0.9)  ){
             step_2(args, number_iterations, nc_min, increase_nc, value_division, tm_created);
             if ((++cnt>=files_per_slot) | increase_nc){
                 nc_min+=0.1;
@@ -134,7 +134,7 @@ void tprl::step_2(Args args, unsigned long long &number_iterations, double &nc_m
             auto tape = tm.get_tape();
             Metrics metrics = ncMarkovTables.update_get_metrics_min_nc(tape);
             ncMarkovTables.reset();
-            if(metrics.normalizedCompression > nc_min & metrics.amplitude>10 & metrics.normalizedCompression < (nc_min+0.1) ){
+            if(metrics.normalizedCompression > nc_min && metrics.amplitude>10 && metrics.normalizedCompression < (nc_min+0.1) ){
                 new_entry = tm_created.insert(tm.get_tape().print_written_tape(false)).second;
             }
         }

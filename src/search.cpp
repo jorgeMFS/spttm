@@ -1,6 +1,8 @@
 
-#include <future>
+#include <cstring>
+#include<filesystem>
 #include <fstream>
+#include <future>
 #include <thread>
 #include <unordered_set>
 
@@ -60,7 +62,7 @@ std::vector<std::pair<std::string, double>> Search::SequentialSearch(TmId traver
         } 
         st.next();
         counter += 1;
-    } while ((counter < traversal_length) & (found_program==false));
+    } while ((counter < traversal_length) && (found_program==false));
     return tm_data;
 }
 
@@ -216,7 +218,7 @@ void Search::write_to_file(std::unordered_map<std::string, double> results){
     auto search_mode_subfolder=args.search_strategy;
     std::string path = "results/"+alphabet_subfolder+"/"+state_subfolder+"/"+search_mode_subfolder+"/";
     std::filesystem::create_directories(path);
-    std::string file = path + args.input_file+"_"+std::to_string(++file_counter);
+    std::string file = path + args.target_file;
     std::ofstream outFile(file);
     for (auto &el: results){
         outFile  << el.first << "\t" << el.second << std::endl;

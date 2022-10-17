@@ -32,6 +32,7 @@ def _initialize():
             for mode in sModes:
                 path = "results/"+str(alphabet)+"/"+str(state)+"/"+str(mode)+"/";           
                 for filename in os.listdir(path):
+                    
                     f = os.path.join(path, filename)
                     fl_result = _process_file(f)
                     if fl_result[0]>0:

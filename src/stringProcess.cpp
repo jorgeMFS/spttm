@@ -109,7 +109,7 @@ std::vector<double> StringProcess::readinput(MarkovTable& markovTable) const {
 }
 
 std::vector<MarkovTable> StringProcess::get_models(Args &args,std::vector<unsigned int> &confirmation_vector, bool &print_bool) const{
-  unsigned int index;
+  unsigned int index=0;
  
   for (auto i=0u; i<transcribed_vectors.size(); ++i){
     if( get_transcribed_vector(i) == confirmation_vector){

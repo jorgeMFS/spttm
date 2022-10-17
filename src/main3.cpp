@@ -9,7 +9,7 @@
 int main (int argc, char **argv){
   Args argument = parseArgs(argc,argv);  
   printArgs(argument);
-  bool print_all;
+  bool print_all = false;
   char answer;
   std::cerr << bold_on <<"Do you want to print all tm information ("<< 
   green_on<<"Y"<<bold_off<< "/"<< bold_on<<red_on<<"N"<<bold_off<< bold_on<<")?\n"<<bold_off;
