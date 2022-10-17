@@ -84,13 +84,15 @@ std::vector<std::pair<std::string, double>> Search::MonteCarloSearch(TmId traver
     std::unordered_set<std::string> st_matrix;
     bool entry=false;
 
-    auto rd_dev = std::random_device{};
-    std::seed_seq seq{rd_dev(), rd_dev(), rd_dev(), rd_dev()};
-    std::mt19937 rng(seq);
-
-    if (seed>0){
-        std::minstd_rand rng{seed};
+    
+    std::minstd_rand rng{seed};
+    
+    if(seed==0){
+      auto rd_dev = std::random_device{};
+      std::seed_seq seq{rd_dev(), rd_dev(), rd_dev(), rd_dev()};
+      std::mt19937 rng(seq);
     }
+
 
     for (auto counter = 0ull; counter < traversal_length; counter++) {
         if(found_program){
