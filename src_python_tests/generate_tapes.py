@@ -21,11 +21,7 @@ def _initialize():
     
     for alphabet in range(2,5):
         for state in range(2,31):
-            SEARCH_MODE='M'
             os.system(f'./tprl   -e {SEED} -s {state} -a {alphabet} -i {TAPE_ITERATIONS}  -f {FILE_PREFIX}  -N {NUMBER_GEN_FILES}')            
-            SEARCH_MODE='S'
-            os.system(f'./tprl   -e {SEED} -s {state} -a {alphabet} -i {TAPE_ITERATIONS}  -f {FILE_PREFIX}  -N {NUMBER_GEN_FILES}')
-
 def main():
     _initialize()
 

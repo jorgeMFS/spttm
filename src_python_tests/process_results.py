@@ -21,12 +21,15 @@ CSV_FILE="search_results"
 
 def _initialize():
     os.chdir(working_dir)
-    os.mkdir(save_csv_path)
+    if not os.path.exists(save_csv_path):
+        os.mkdir(save_csv_path)
     writeCSVLine(['Alphabet','States', 'Search', 'Average N. Results', 'Average Loss', 'Programs Found'])
     for alphabet in range(2,5):
         for state in range(2,31):
             file_results = []
-            for mode in [x[0].replace(".","").replace("/","") for x in os.walk(".")][1:]:
+            path_s=  "results/"+str(alphabet)+"/"+str(state)+"/"
+            sModes = [x[0].split("/")[-1] for x in os.walk(path_s)][1:]
+            for mode in sModes:
                 path = "results/"+str(alphabet)+"/"+str(state)+"/"+str(mode)+"/";           
                 for filename in os.listdir(path):
                     f = os.path.join(path, filename)
@@ -34,10 +37,7 @@ def _initialize():
                     if fl_result[0]>0:
                         file_results.append(fl_result)
                 results=_process_results(file_results)
-                writeCSVLine([alphabet,state,mode]+results)
-                print(results)
-                sys.exit()
-
+                writeCSVLine([str(alphabet),str(state),mode]+results)
 
 
 
@@ -50,7 +50,7 @@ def _process_results(listOfResults):
     lossValues=[lst[1] for lst in listOfResults]
     avgLoss=reduce(lambda a, b: a + b, lossValues) / len(lossValues)
     programsFound=[lst[2] for lst in listOfResults].count(True)
-    return [avgNumber, avgLoss, programsFound]
+    return [str(avgNumber), str(avgLoss), str(programsFound)]
 
 
 def _process_file(filepath):

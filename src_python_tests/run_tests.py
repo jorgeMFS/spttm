@@ -30,7 +30,7 @@ def _initialize():
                 f = os.path.join(path, filename)
                 for searchMode in SEARCH_MODE:
                     os.system(f'./spark   -s {state} -a {alphabet} -A {ALPHA} -i {TAPE_ITERATIONS} -l {LAMBDA} -k {K_INIT}:{K_LAST} -T {THRESHOLD} -S {searchMode} -t {f} -j {THREADS} -n {MACHINES_TO_RUN}')
-                
+            sys.exit()
 def main():
     _initialize()
 
