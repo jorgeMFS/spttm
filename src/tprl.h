@@ -26,14 +26,13 @@ struct tprl{
     unsigned int input_amplitude;
     unsigned int counter;
     std::vector<double> per_elem_input;
-    std::unordered_set<std::string> tm_created;
-    unsigned long long detector_counter=0;
-    unsigned int less_dect=0;
+    
     StateMatrix st;
     std::minstd_rand rng;
+   
 
     tprl(Args args, bool print_all_bool);
     void step(Args args);
-    void step_2(Args args);
+    void step_2(Args args, unsigned long long &number_iterations, double &nc_min, bool &increase_nc, unsigned long long & value_division, std::unordered_set<std::string> &tm_created);
 };
     std::tuple<StateMatrix, unsigned long long, std::vector<unsigned int>, double, unsigned int>read_file();

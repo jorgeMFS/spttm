@@ -64,8 +64,14 @@ E.g.
 ```
 
 Example of running tprl:
+Mode (Y)
 ```
 ./tprl   -e 555 -s 2 -a 2 -i 100 -A 20 -k 2 -f "A" -o 20 -N 10000
+```
+
+Mode (N)
+```
+./tprl -e 555 -s 2 -a 2 -i 1000 -A 20 -k 2:5 -f "test" -N 100 -n 1000000 
 ```
 
 Outputs: files in dataset folder

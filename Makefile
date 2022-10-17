@@ -34,6 +34,8 @@ objects3 = src/tmId.o \
 		  src/util.o \
 		  src/parseArgs.o \
 		  src/read_input.o \
+		  src/metrics.o \
+		  src/nc.o\
 		  src/tprl.o \
  		  src/main3.o 
 
@@ -125,16 +127,19 @@ compute_nrc.o: src/compute_nrc.cpp src/parseArgs.h src/stringProcess.h src/nrc.h
 
 spark.o: src/spark.cpp src/parseArgs.h src/search.h
 
-
 src/interactiveMarkovModel.o: src/interactiveMarkovModel.cpp src/interactiveMarkovModel.h src/markovTable.h
 
 src/kullbackLeiblerDivergency.o: src/kullbackLeiblerDivergency.cpp src/kullbackLeiblerDivergency.h
 
 src/loss.o: src/loss.cpp src/loss.h src/kullbackLeiblerDivergency.h
 
+src/nc.o: src/nc.cpp src/nc.h src/markovTable.h src/metrics.h
+
 src/nrc.o: src/nrc.cpp src/nrc.h
 
 src/markovTable.o: src/markovTable.cpp src/markovTable.h src/turingMachine.h src/util.h
+
+src/metrics.o: src/metrics.cpp src/metrics.h
 
 src/parseArgs.o: src/parseArgs.cpp src/parseArgs.h src/util.h
 
@@ -150,7 +155,7 @@ src/turingMachine.o: src/turingMachine.cpp src/turingMachine.h src/tmId.h
 
 src/tmId.o: src/tmId.cpp src/tmId.h 
 
-src/tprl.o: src/tprl.cpp src/tprl.h
+src/tprl.o: src/tprl.cpp src/tprl.h src/nc.h src/metrics.h  src/markovTable.h
 
 src/util.o: src/util.cpp src/util.h
 
