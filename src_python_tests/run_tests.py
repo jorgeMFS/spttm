@@ -15,11 +15,6 @@ from config import TAPE_ITERATIONS,K_INIT,K_LAST,ALPHA,LAMBDA,THRESHOLD,THREADS,
 #Paths
 working_dir="../"
 
-# Variables
-
-
-
-
 
 def _initialize():
     os.chdir(working_dir)

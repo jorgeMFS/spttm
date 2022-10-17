@@ -18,8 +18,6 @@ working_dir="../"
 
 def _initialize():
     os.chdir(working_dir)
-    current_directory = os.getcwd()
-    print("Current working directory:", current_directory)
     
     for alphabet in range(2,5):
         for state in range(2,31):
