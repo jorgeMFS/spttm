@@ -339,7 +339,7 @@ Args parseArgs (int argc, char **argv){
             exit(0);
         }
     }
-    if(argument.tape_iterations>0 & argument.num_out_lines>0){
+    if(argument.tape_iterations>0 && argument.num_out_lines>0){
         assertm(((argument.tape_iterations % argument.num_out_lines)==0), "num_out_lines must be mod of tape_iterations");
     }
     return argument;
