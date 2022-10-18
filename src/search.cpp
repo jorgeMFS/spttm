@@ -48,7 +48,7 @@ std::vector<std::pair<std::string, double>> Search::SequentialSearch(TmId traver
     StateMatrix st(args.states,args.alphabet_size);
     TmId counter = 0;
     if (traversal_offset > 0) {
-                st.set_by_index(traversal_offset);
+        st.set_by_index(traversal_offset);
     }
 
     do {
@@ -131,7 +131,6 @@ std::unordered_map<std::string, double> Search::MonteCarloSearchMulticore() {
   if (args.jobs > traversal_len) {
     args.jobs = traversal_len;
   }
-  
   auto partition_len = traversal_len / args.jobs;
   auto partition_rest = traversal_len % args.jobs;
 
@@ -146,7 +145,7 @@ std::unordered_map<std::string, double> Search::MonteCarloSearchMulticore() {
     works.push_back(std::async([=]() {
         std::cerr << "Worker #" << i << " started @ partition ["  <<  len <<  "[" << std::endl;
         seed = (prime * seed) % 4079;
-        std::cerr << "seed =>" << seed<< std::endl;
+        //std::cerr << "seed =>" << seed<< std::endl;
         auto o = MonteCarloSearch(len);
         std::cerr << "Worker #" << i << " finished" << std::endl;
         return o;
