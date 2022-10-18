@@ -54,10 +54,10 @@ std::vector<std::pair<std::string, double>> Search::SequentialSearch(TmId traver
     do {
         double loss = test_machine(st,all_models);
         if(loss<args.threshold) {
-            std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
             tm_data.push_back(std::pair<std::string, double>(st.get_state_matrix_string(), loss));
-            std::cerr<< st.get_state_matrix_string()<<std::endl;
             if(loss==0){
+                std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
+                std::cerr<< st.get_state_matrix_string()<<std::endl;
                 found_program=true;
                 return tm_data;
             }
@@ -113,12 +113,12 @@ std::vector<std::pair<std::string, double>> Search::MonteCarloSearch(TmId traver
         double loss = test_machine(st,all_models);
 
         if(loss<args.threshold) {
-            std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
-            std::cerr<< st.get_state_matrix_string()<<std::endl;
             tm_data.push_back(std::pair<std::string, double>(st.get_state_matrix_string(), loss));
             if(loss==0){
-                found_program=true;
-                return tm_data;
+              std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
+              std::cerr<< st.get_state_matrix_string()<<std::endl;
+              found_program=true;
+              return tm_data;
             }
         } 
     }
