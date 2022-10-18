@@ -4,8 +4,9 @@
 #include <fstream>
 #include <future>
 #include <thread>
+#include <string>
+#include <sstream>
 #include <unordered_set>
-
 
 #include "search.h"
 #include "util.h"
@@ -213,14 +214,32 @@ std::unordered_map<std::string, double> Search::SequentialSearchMulticore(){
 
 
 void Search::write_to_file(std::unordered_map<std::string, double> results){
+    if(results.empty()){return;}
     auto alphabet_subfolder=std::to_string(args.alphabet_size);
     auto state_subfolder=std::to_string(args.states);
     auto search_mode_subfolder=args.search_strategy;
-    std::string path = "results/"+alphabet_subfolder+"/"+state_subfolder+"/"+search_mode_subfolder+"/";
+    auto nc_subfolder = parse_target_file_to_get_nc(args.target_file);
+    
+    std::string path = "results/"+alphabet_subfolder+"/"+state_subfolder+"/"+search_mode_subfolder+"/"+nc_subfolder+"/";
     std::filesystem::create_directories(path);
     std::string file = path + args.target_file;
     std::ofstream outFile(file);
     for (auto &el: results){
         outFile  << el.first << "\t" << el.second << std::endl;
     }
+}
+
+std::string parse_target_file_to_get_nc(std::string &file_name){
+  std::stringstream parse_file(file_name);
+    std::vector<std::string> seglist;
+    std::string segment;
+    while(std::getline(parse_file, segment, '/'))
+    {
+      seglist.push_back(segment);
+    }
+    file_name=seglist.back();
+    if(seglist.size()==5){
+      return seglist[3];
+    }
+    return seglist.back();
 }

@@ -47,3 +47,4 @@ struct Search{
 
 };
 
+std::string parse_target_file_to_get_nc(std::string &file_name);
