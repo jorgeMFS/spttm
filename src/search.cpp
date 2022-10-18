@@ -13,8 +13,9 @@
 
 
 Search::Search(Args args, double weight): args(args),loss(args,weight),traversal_len(args.traversal_len), seed(args.sd){
-    if (args.traversal_len==0){
-        traversal_len=tm_cardinality(args.states, args.alphabet_size);
+    TmId max_value = tm_cardinality(args.states, args.alphabet_size); 
+    if (args.traversal_len==0 || args.traversal_len> max_value){
+        traversal_len=max_value;
     }
     init();
 }
