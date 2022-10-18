@@ -25,12 +25,13 @@ def _initialize():
     
     for alphabet in range(2,5):
         for state in range(2,31):
-            path = "tapeTestPool/"+str(alphabet)+"/"+str(state)+"/";           
-            for filename in os.listdir(path):
-                f = os.path.join(path, filename)
-                for searchMode in SEARCH_MODE:
-                    os.system(f'./spark   -s {state} -a {alphabet} -A {ALPHA} -i {TAPE_ITERATIONS} -l {LAMBDA} -k {K_INIT}:{K_LAST} -T {THRESHOLD} -S {searchMode} -t {f} -j {THREADS} -n {MACHINES_TO_RUN}')
-            sys.exit()
+            for nc in range(0,1,10):
+                path = "tapeTestPool/"+str(alphabet)+"/"+str(state)+"/"+str(nc)+"/"; 
+                if os.path.exists(path):
+                    for filename in os.listdir(path):
+                        f = os.path.join(path, filename)
+                        for searchMode in SEARCH_MODE:
+                            os.system(f'./spark   -s {state} -a {alphabet} -A {ALPHA} -i {TAPE_ITERATIONS} -l {LAMBDA} -k {K_INIT}:{K_LAST} -T {THRESHOLD} -S {searchMode} -t {f} -j {THREADS} -n {MACHINES_TO_RUN}')
 def main():
     _initialize()
 

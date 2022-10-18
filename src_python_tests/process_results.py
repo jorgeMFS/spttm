@@ -23,22 +23,24 @@ def _initialize():
     os.chdir(working_dir)
     if not os.path.exists(save_csv_path):
         os.mkdir(save_csv_path)
-    writeCSVLine(['Alphabet','States', 'Search', 'Average N. Results', 'Average Loss', 'Programs Found'])
+    writeCSVLine(['Alphabet','States', 'Search', 'NC','File Number', 'Average N. Results', 'Average Loss', 'Programs Found'])
     for alphabet in range(2,5):
         for state in range(2,31):
-            file_results = []
             path_s=  "results/"+str(alphabet)+"/"+str(state)+"/"
             sModes = [x[0].split("/")[-1] for x in os.walk(path_s)][1:]
             for mode in sModes:
-                path = "results/"+str(alphabet)+"/"+str(state)+"/"+str(mode)+"/";           
-                for filename in os.listdir(path):
-                    
-                    f = os.path.join(path, filename)
-                    fl_result = _process_file(f)
-                    if fl_result[0]>0:
-                        file_results.append(fl_result)
-                results=_process_results(file_results)
-                writeCSVLine([str(alphabet),str(state),mode]+results)
+                    for nc in range(0,10):
+                        path = "results/"+str(alphabet)+"/"+str(state)+"/"+str(nc)+"/";
+                        file_results = []
+                        if os.path.exists(path):
+                            for filename in os.listdir(path):
+                                f = os.path.join(path, filename)
+                                fl_result = _process_file(f)
+                                if fl_result[0]>0:
+                                    file_results.append(fl_result)
+                            numberOfResults=len(file_results)
+                            results=_process_results(file_results)
+                            writeCSVLine([str(alphabet),str(state),mode, str(nc/10),str(numberOfResults)]+results)
 
 
 
