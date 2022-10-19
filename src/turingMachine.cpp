@@ -125,6 +125,10 @@ StateMatrix::StateMatrix():
 StateMatrix::StateMatrix(unsigned int number_of_states, unsigned int alphabet_size):
   v(alphabet_size * number_of_states, TuringRecord{0, 0, 0}), nbStates(number_of_states), alphSz(alphabet_size){}
 
+StateMatrix::StateMatrix(unsigned int number_of_states, unsigned int alphabet_size, std::minstd_rand &rng):
+  v(alphabet_size * number_of_states, TuringRecord{0, 0, 0}), nbStates(number_of_states), alphSz(alphabet_size){
+    set_random(rng);
+    }
 
 StateMatrix::StateMatrix(std::string string_state_matrix, unsigned int number_of_states, unsigned int alphabet_size){
   

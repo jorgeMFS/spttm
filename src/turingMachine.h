@@ -59,6 +59,7 @@ struct StateMatrix{
   unsigned int alphSz;
   StateMatrix();
   StateMatrix(unsigned int number_of_states, unsigned int alphabet_size);
+  StateMatrix(unsigned int number_of_states, unsigned int alphabet_size, std::minstd_rand &rng);
   StateMatrix(std::string string_state_matrix, unsigned int number_of_states, unsigned int alphabet_size);
   bool operator==(const StateMatrix &st) const;
   bool operator<(const StateMatrix &st1) const;

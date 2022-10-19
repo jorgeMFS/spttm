@@ -221,11 +221,8 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
     args.jobs = traversal_len;
   }
 
-  std::cerr<<"chego aqui 2!"<<std::endl;
   TmId partition_len = div128by32(traversal_len, args.jobs);
-  std::cerr<<"chego aqui! 3"<<std::endl;
   TmId partition_rest = traversal_len % args.jobs;
-  std::cerr<<"chego aqui!"<<std::endl;
 
   // spawn  tasks asynchronously
   std::vector<std::future<std::vector<std::pair<std::string, double>>>> works;
@@ -234,13 +231,12 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
     if (i == args.jobs - 1) {
       len += partition_rest;
     }
-    std::cerr<<"chego aqui!"<<std::endl;
     std::cerr<<"partition_len:"<<partition_len <<std::endl;
 
     works.push_back(std::async([=]() {
         std::cerr << "Worker #" << i << " TMs to test :"  <<  len <<  "..." << std::endl;
         seed = (prime * seed) % 4079;
-        //std::cerr << "seed =>" << seed<< std::endl;
+        std::cerr << "seed =>" << seed<< std::endl;
         auto o = TreeSearch(len);
         std::cerr << "Worker #" << i << " finished" << std::endl;
         return o;
@@ -281,13 +277,12 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
     std::minstd_rand rng{seed};
     
     if(seed==0){
-      auto rd_dev = std::random_device{};
-      std::seed_seq seq{rd_dev(), rd_dev(), rd_dev(), rd_dev()};
-      std::mt19937 rng(seq);
+      thread_local std::random_device rd_dev{};
+      thread_local std::seed_seq seq{rd_dev(), rd_dev(), rd_dev(), rd_dev()};
+      thread_local std::mt19937 rng(seq);
     }
 
-    StateMatrix st(args.states, args.alphabet_size);
-    st.set_random(rng);
+    thread_local StateMatrix st(args.states, args.alphabet_size, rng);
     loss = test_machine(st,all_models);
     RuleMatrixNode startNode(st.get_state_matrix_string(), loss);
     nodesToOpen.push(startNode);
@@ -331,8 +326,6 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
   std::cerr<<"counter: "<<counter<<std::endl;
   return tm_data;
 }
-
-
 
 void Search::write_to_file(std::unordered_map<std::string, double> results){
     if(results.empty()){return;}
