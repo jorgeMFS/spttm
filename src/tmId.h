@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+static const __uint128_t UINT128_MAX =__uint128_t(__int128_t(-1L));
+
 #ifdef __SIZEOF_INT128__
     // do some fancy stuff here
     using TmId = __uint128_t;

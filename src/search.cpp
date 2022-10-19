@@ -14,7 +14,7 @@
 
 
 Search::Search(Args args, double weight): args(args),loss(args,weight),traversal_len(args.traversal_len), seed(args.sd){
-    TmId max_value = tm_cardinality(args.states, args.alphabet_size); 
+    TmId max_value = get_tm_cardinality(args.states, args.alphabet_size); 
     if (args.traversal_len==0 || args.traversal_len> max_value){
         traversal_len=max_value;
     }
@@ -34,7 +34,7 @@ void Search::init(){
        results = MonteCarloSearchMulticore();
     } 
     else if(std::strcmp(args.search_strategy, "Tree_Search")==0){
-      TreeSearch();
+      results = TreeSearchMulticore();
     }
     else if(std::strcmp(args.search_strategy, "Neural_Networks") == 0){
         std::cout << "ERROR ERROR" << std::endl;
@@ -147,7 +147,7 @@ std::unordered_map<std::string, double> Search::MonteCarloSearchMulticore() {
     }
 
     works.push_back(std::async([=]() {
-        std::cerr << "Worker #" << i << " started @ partition ["  <<  len <<  "[" << std::endl;
+        std::cerr << "Worker #" << i << " TMs to test :"  <<  len <<  "..." << std::endl;
         seed = (prime * seed) % 4079;
         //std::cerr << "seed =>" << seed<< std::endl;
         auto o = MonteCarloSearch(len);
@@ -158,7 +158,6 @@ std::unordered_map<std::string, double> Search::MonteCarloSearchMulticore() {
   }
 
   std::vector<std::pair<std::string, double>> total;
-
   for (auto& f: works) {
     auto r = f.get();
     total.insert(end(total), begin(std::move(r)), end(std::move(r)));
@@ -169,7 +168,6 @@ std::unordered_map<std::string, double> Search::MonteCarloSearchMulticore() {
         unordered_map.insert (pair);
     }
   return unordered_map;
-
 }
 
 std::unordered_map<std::string, double> Search::SequentialSearchMulticore(){
@@ -215,7 +213,56 @@ std::unordered_map<std::string, double> Search::SequentialSearchMulticore(){
   return unordered_map;
 }
 
-std::vector<std::pair<std::string, double>> Search::TreeSearch(){
+
+std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
+// split work in partitions
+  
+  if (args.jobs > traversal_len) {
+    args.jobs = traversal_len;
+  }
+
+  std::cerr<<"chego aqui 2!"<<std::endl;
+  TmId partition_len = div128by32(traversal_len, args.jobs);
+  std::cerr<<"chego aqui! 3"<<std::endl;
+  TmId partition_rest = traversal_len % args.jobs;
+  std::cerr<<"chego aqui!"<<std::endl;
+
+  // spawn  tasks asynchronously
+  std::vector<std::future<std::vector<std::pair<std::string, double>>>> works;
+  for (auto i = 0u; i < args.jobs; ++i) {
+    auto len = partition_len;
+    if (i == args.jobs - 1) {
+      len += partition_rest;
+    }
+    std::cerr<<"chego aqui!"<<std::endl;
+    std::cerr<<"partition_len:"<<partition_len <<std::endl;
+
+    works.push_back(std::async([=]() {
+        std::cerr << "Worker #" << i << " TMs to test :"  <<  len <<  "..." << std::endl;
+        seed = (prime * seed) % 4079;
+        //std::cerr << "seed =>" << seed<< std::endl;
+        auto o = TreeSearch(len);
+        std::cerr << "Worker #" << i << " finished" << std::endl;
+        return o;
+    }));
+    
+  }
+
+  std::vector<std::pair<std::string, double>> total;
+
+  for (auto& f: works) {
+    auto r = f.get();
+    total.insert(end(total), begin(std::move(r)), end(std::move(r)));
+  }
+
+  std::unordered_map<std::string, double> unordered_map;
+    for(auto &pair:total){
+        unordered_map.insert (pair);
+    }
+  return unordered_map;
+}
+
+std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_length){
   AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
   std::vector<std::pair<std::string, double>> tm_data;
   std::unordered_set<std::string>visitedNodes;
@@ -223,7 +270,6 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(){
 
   std::vector<TuringRecord> possibleRules = get_possible_rules(args.states,args.alphabet_size);
   unsigned int counter=0u;
-  traversal_len=args.traversal_len;
   // Add the starting rule to the nodes to open
   double loss;
   const double RAND_MAX_MACHINES=10u;
@@ -231,10 +277,15 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(){
 
   // multiple samples for better initialization
   for (auto i=0u;i<RAND_MAX_MACHINES;i++){
-    auto rd_dev = std::random_device{};
-    std::seed_seq seq{rd_dev(), rd_dev(), rd_dev(), rd_dev()};
-    std::mt19937 rng(seq);
+
+    std::minstd_rand rng{seed};
     
+    if(seed==0){
+      auto rd_dev = std::random_device{};
+      std::seed_seq seq{rd_dev(), rd_dev(), rd_dev(), rd_dev()};
+      std::mt19937 rng(seq);
+    }
+
     StateMatrix st(args.states, args.alphabet_size);
     st.set_random(rng);
     loss = test_machine(st,all_models);
@@ -242,9 +293,10 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(){
     nodesToOpen.push(startNode);
     visitedNodes.insert(startNode.identifier);
   }
+
   auto i=0u;
-  std::cerr<<"search :"<<traversal_len<<std::endl;
-  while((!nodesToOpen.empty()) && (i<traversal_len)) { // || 
+  std::cerr<<"search :"<<traversal_length<<std::endl;
+  while((!nodesToOpen.empty()) && (i<traversal_length)) { // || 
     auto currentNode = nodesToOpen.top();
     nodesToOpen.pop();
     ++counter;
@@ -311,4 +363,9 @@ std::string parse_target_file_to_get_nc(std::string &file_name){
       return seglist[3];
     }
     return seglist.back();
+}
+
+unsigned __int128 div128by32(unsigned __int128 x, uint64_t y)
+{
+    return x/y;
 }

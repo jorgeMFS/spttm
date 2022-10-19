@@ -58,11 +58,18 @@ bool randomBool() {
     return gen();
 }
 
-TmId tm_cardinality(unsigned int states, unsigned int alphabet_size) {
+TmId get_tm_cardinality(unsigned int states, unsigned int alphabet_size) {
+    if ((alphabet_size ==2 && states>10) || (alphabet_size==3 && states>7) || (alphabet_size==4 && states>5) || (alphabet_size >4 && states>2) ){
+        std::cerr<<bold_on<<red_on<<"Value larger than 128 bits, considering transversal lenght the same as max uint128 "<<bold_off<<std::endl;
+        return UINT128_MAX;
+    }
+    
+    std::cerr<<states<<":"<<alphabet_size<<std::endl;
     TmId nstates = states;
     TmId nalphabet = alphabet_size;
-    auto record_cardinality = nstates * nalphabet * 3;
+    TmId record_cardinality = nstates * nalphabet * 3;
 
+    std::cerr<<"base:"<< record_cardinality <<", exp:"<< nstates * nalphabet<<std::endl;
     return ipow(record_cardinality, nstates * nalphabet);
 }
 

@@ -23,6 +23,7 @@
 */
 template <typename T>
 T ipow(T base, T exp) {
+    
     if (exp == 0) {
       return 1;
     }
@@ -76,7 +77,7 @@ void power(int x, int n);
  * @param states the state cardinality
  * @param alphabet_size the alphabet's size
 */
-TmId tm_cardinality(unsigned int states, unsigned int alphabet_size);
+TmId get_tm_cardinality(unsigned int states, unsigned int alphabet_size);
 
 
 
