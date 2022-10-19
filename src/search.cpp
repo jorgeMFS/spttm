@@ -251,7 +251,7 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(){
     
 
     StateMatrix st(currentNode.identifier, args.states, args.alphabet_size);
-    auto sucessors = generate_sucessors(st,possibleRules);          
+    auto sucessors = generate_random_sucessors(st,possibleRules,1000);          
     for(auto&sucessor: sucessors){  
       if( visitedNodes.insert(sucessor.get_state_matrix_string()).second){
         loss = test_machine(sucessor,all_models);
@@ -267,7 +267,7 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(){
           }
         }
 
-        if(! (i++ % 10000)){std::cerr<<"counter: "<<counter<< " i : "<< i <<std::endl;
+        if(! (i++ % 1000)){std::cerr<<"counter: "<<counter<< " i : "<< i <<std::endl;
           std::cerr<< "St. String :"<< currentNode.identifier <<"; Cost : " <<currentNode.cost <<std::endl;
         } 
         RuleMatrixNode newNode(sucessor.get_state_matrix_string(), loss);

@@ -72,6 +72,7 @@ spark_object = src/tmId.o \
 		  src/read_input.o \
 		  src/kullbackLeiblerDivergency.o\
 		  src/loss.o\
+		  src/node.o\
 		  src/search.o\
 		  src/spark.o
 
@@ -102,7 +103,7 @@ all: sptm \
 	 tprl \
 	 nrc \
 	 kld \
-	 spark
+	 spark 
 
 clean:
 	rm -f src/*.o sptm
@@ -112,6 +113,7 @@ clean:
 	rm -f src/*o nrc
 	rm -f src/*o kld
 	rm -f src/*.o spark
+	
 
 # Dependencies
 
@@ -135,6 +137,8 @@ src/loss.o: src/loss.cpp src/loss.h src/kullbackLeiblerDivergency.h
 
 src/nc.o: src/nc.cpp src/nc.h src/markovTable.h src/metrics.h
 
+src/node.o: src/node.h src/node.cpp
+
 src/nrc.o: src/nrc.cpp src/nrc.h
 
 src/markovTable.o: src/markovTable.cpp src/markovTable.h src/turingMachine.h src/util.h
@@ -143,7 +147,7 @@ src/metrics.o: src/metrics.cpp src/metrics.h
 
 src/parseArgs.o: src/parseArgs.cpp src/parseArgs.h src/util.h
 
-src/search.o: src/search.cpp src/search.h src/loss.h 
+src/search.o: src/search.cpp src/search.h src/loss.h src/node.h
 
 src/read_input.o: src/read_input.cpp src/read_input.h 
 
