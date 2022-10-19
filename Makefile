@@ -157,12 +157,11 @@ src/stringProcess.o: src/stringProcess.cpp src/stringProcess.h src/markovTable.h
 
 src/turingMachine.o: src/turingMachine.cpp src/turingMachine.h src/tmId.h
 
-src/tmId.o: src/tmId.cpp src/tmId.h 
+src/tmId.o: src/tmId.cpp src/tmId.h
 
 src/tprl.o: src/tprl.cpp src/tprl.h src/nc.h src/metrics.h  src/markovTable.h
 
 src/util.o: src/util.cpp src/util.h
-
 
 
 
