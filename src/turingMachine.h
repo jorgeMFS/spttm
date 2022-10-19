@@ -51,6 +51,7 @@ struct TuringRecord{
 
 std::ostream& operator<<( std::ostream& o, const TuringRecord& r);
 TuringRecord set_random(Rng & rng, unsigned int number_of_states, unsigned int alphabet_size, TuringRecord tr_original);
+std::vector<TuringRecord> get_possible_rules(unsigned int number_of_states, unsigned int alphabet_size);
 
 struct StateMatrix{
   std::vector<TuringRecord> v;
@@ -105,7 +106,7 @@ struct StateMatrix{
 };
 
 StateMatrix determine_last_state_Matrix(const unsigned int& number_of_states, const unsigned int& alphabet_size);
-std::vector<StateMatrix> generate_sucessors(StateMatrix st);
+std::vector<StateMatrix> generate_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules);
 
 struct compare_st{
     bool operator()(const StateMatrix & st1, const StateMatrix  & st2);

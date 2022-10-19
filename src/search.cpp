@@ -3,11 +3,12 @@
 #include<filesystem>
 #include <fstream>
 #include <future>
+#include <queue>
 #include <thread>
 #include <string>
 #include <sstream>
 #include <unordered_set>
-
+#include "node.h"
 #include "search.h"
 #include "util.h"
 
@@ -32,6 +33,9 @@ void Search::init(){
     else if(std::strcmp(args.search_strategy, "Monte_Carlo") == 0){
        results = MonteCarloSearchMulticore();
     } 
+    else if(std::strcmp(args.search_strategy, "Tree_Search")==0){
+      TreeSearch();
+    }
     else if(std::strcmp(args.search_strategy, "Neural_Networks") == 0){
         std::cout << "ERROR ERROR" << std::endl;
         exit(-1); // fix latter
@@ -209,6 +213,71 @@ std::unordered_map<std::string, double> Search::SequentialSearchMulticore(){
         unordered_map.insert (pair);
     }
   return unordered_map;
+}
+
+std::vector<std::pair<std::string, double>> Search::TreeSearch(){
+  AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
+  std::vector<std::pair<std::string, double>> tm_data;
+  std::unordered_set<std::string>visitedNodes;
+  std::priority_queue<RuleMatrixNode> nodesToOpen;
+
+  std::vector<TuringRecord> possibleRules = get_possible_rules(args.states,args.alphabet_size);
+  unsigned int counter=0u;
+  traversal_len=args.traversal_len;
+  // Add the starting rule to the nodes to open
+  double loss;
+  const double RAND_MAX_MACHINES=10u;
+  //const double RAND_MAX_MACHINES=1u;
+
+  // multiple samples for better initialization
+  for (auto i=0u;i<RAND_MAX_MACHINES;i++){
+    auto rd_dev = std::random_device{};
+    std::seed_seq seq{rd_dev(), rd_dev(), rd_dev(), rd_dev()};
+    std::mt19937 rng(seq);
+    
+    StateMatrix st(args.states, args.alphabet_size);
+    st.set_random(rng);
+    loss = test_machine(st,all_models);
+    RuleMatrixNode startNode(st.get_state_matrix_string(), loss);
+    nodesToOpen.push(startNode);
+    visitedNodes.insert(startNode.identifier);
+  }
+  auto i=0u;
+  std::cerr<<"search :"<<traversal_len<<std::endl;
+  while((!nodesToOpen.empty()) && (i<traversal_len)) { // || 
+    auto currentNode = nodesToOpen.top();
+    nodesToOpen.pop();
+    ++counter;
+    
+
+    StateMatrix st(currentNode.identifier, args.states, args.alphabet_size);
+    auto sucessors = generate_sucessors(st,possibleRules);          
+    for(auto&sucessor: sucessors){  
+      if( visitedNodes.insert(sucessor.get_state_matrix_string()).second){
+        loss = test_machine(sucessor,all_models);
+
+        if(loss<args.threshold) {
+          tm_data.push_back(std::pair<std::string, double>(sucessor.get_state_matrix_string(), loss));
+          if(loss==0){
+            std::cerr<< bold_on  << green_on <<"Found SOLUTION !!"<<bold_off<<std::endl;
+            std::cerr<< bold_on  << green_on <<"Number of machines ran " << i+RAND_MAX_MACHINES <<" | Number of nodes open "<< counter<<bold_off<<std::endl;
+            std::cerr<< sucessor.get_state_matrix_string()<<std::endl;
+            found_program=true;
+            return tm_data;
+          }
+        }
+
+        if(! (i++ % 10000)){std::cerr<<"counter: "<<counter<< " i : "<< i <<std::endl;
+          std::cerr<< "St. String :"<< currentNode.identifier <<"; Cost : " <<currentNode.cost <<std::endl;
+        } 
+        RuleMatrixNode newNode(sucessor.get_state_matrix_string(), loss);
+        nodesToOpen.push(newNode);
+      }
+
+    }
+  }
+  std::cerr<<"counter: "<<counter<<std::endl;
+  return tm_data;
 }
 
 

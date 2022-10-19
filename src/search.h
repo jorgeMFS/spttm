@@ -36,9 +36,9 @@ struct Search{
     
     private:
         void init();
-
         std::unordered_map<std::string, double> SequentialSearchMulticore();
         std::unordered_map<std::string, double> MonteCarloSearchMulticore();
+        std::vector<std::pair<std::string, double>> TreeSearch();
         std::vector<std::pair<std::string, double>> SequentialSearch(TmId traversal_length, TmId traversal_offset);
         std::vector<std::pair<std::string, double>> MonteCarloSearch(TmId traversal_length);
         double test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models);

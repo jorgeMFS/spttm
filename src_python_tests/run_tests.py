@@ -25,7 +25,7 @@ def _initialize():
     
     for alphabet in range(2,5):
         for state in range(2,31):
-            for nc in range(0,1,10):
+            for nc in range(0,10):
                 path = "tapeTestPool/"+str(alphabet)+"/"+str(state)+"/"+str(nc)+"/"; 
                 if os.path.exists(path):
                     for filename in os.listdir(path):
