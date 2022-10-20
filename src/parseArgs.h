@@ -30,6 +30,7 @@ struct Args{
     unsigned int n_files=0;
     unsigned int num_out_lines=0;
     double threshold=0.1;
+    unsigned int min_successors;
     const char * search_strategy = "Null";
     TmId traversal_len=0;
 };

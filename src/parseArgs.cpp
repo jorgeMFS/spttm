@@ -39,13 +39,14 @@ Args parseArgs (int argc, char **argv){
             {"lambda", optional_argument, 0, 'l'},
             {"input_file", optional_argument, 0 ,'f'},
             {"target_file", optional_argument, 0 ,'t'},
+            {"min_successors", optional_argument, 0 ,'m'},
             {"number_files", optional_argument, 0 ,'N'},
             {"strategy", optional_argument, 0, 'S'},
             {NULL, 0, NULL, 0}
         };
         int option_index = 0;
 
-        int c = getopt_long (argc, argv, "e:s:a:A:i:n:j:o:T:l:k:f:t:N:S:h",
+        int c = getopt_long (argc, argv, "e:s:a:A:i:n:m:j:o:T:l:k:f:t:N:S:h",
                         long_options, &option_index);
 
         if (c == -1)
@@ -166,6 +167,16 @@ Args parseArgs (int argc, char **argv){
             argument.traversal_len = parsed;
             break;
         }
+        }
+        case 'm':
+        {
+            auto parsed = strtoull(optarg, &end, 10);
+            if (*end != '\0') {
+                std::cerr << "Invalid input for -N.\n";
+                exit(0);
+            }
+            argument.min_successors = parsed;
+            break;
         }
         case 'N':
             {
@@ -356,6 +367,7 @@ void printArgs(Args arguments){
     std::cout<< "Alphabet Size => " << arguments.alphabet_size<< std::endl;
     std::cout<< "Tape Iterations => " << arguments.tape_iterations << std::endl;
     std::cout<< "Traversal Length => " << arguments.traversal_len << std::endl;
+    std::cout<< "Minimum Sucessors => " << arguments.min_successors<< std::endl;
     std::cout<< "Input file => " << arguments.input_file << std::endl;
     std::cout<< "Target file => " << arguments.target_file << std::endl;
     std::cout<< "Number of files => " << arguments.n_files << std::endl;
