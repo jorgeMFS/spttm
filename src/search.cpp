@@ -289,6 +289,8 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
     visitedNodes.insert(startNode.identifier);
   }
 
+ // std::uniform_int_distribution<int>  distr(range_from, range_to);
+
   auto i=0u;
   std::cerr<<"search :"<<traversal_length<<std::endl;
   while((!nodesToOpen.empty()) && (i<traversal_length)) { // || 
