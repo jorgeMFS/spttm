@@ -15,6 +15,19 @@ Loss::Loss(Args &args, double &weight):w(weight),kl(args){
     }
 }
 
+double Loss::length_penalizer(MarkovTable &mkv_table){
+    auto input_length = mkv_table.sum_all_elem();
+    auto targer_lenght = kl.target_lenght;
+    
+    if (input_length>=targer_lenght){
+        return -log2(targer_lenght/static_cast<double>(input_length)); // 0.0001
+    }else{
+        return -log2(input_length/static_cast<double>(targer_lenght));
+    }
+    //return -log2(input_length/targer_lenght) - log2(targer_lenght/input_length);
+
+}
+
 double Loss::compute_loss(std::vector<MarkovTable> &mkv_table_vector){
     double conditional_divergence=0;
     double seq_string_divergence=0;
@@ -34,7 +47,10 @@ double Loss::compute_loss(std::vector<MarkovTable> &mkv_table_vector){
         auto seq_string_divergence_vector = kl.compute_divergency_p_k_elem(mkv_table_vector);
         seq_string_divergence = average_divergence_vector(seq_string_divergence_vector);
         conditional_divergence = average_divergence_vector(conditional_divergence_vector);
-        return (conditional_divergence*w)+(seq_string_divergence*(1-w));
+        // add penalty when lenght of the tapes differ
+
+
+        return (conditional_divergence*w)+(seq_string_divergence*(1-w)) + length_penalizer(mkv_table_vector[0]);
     }
 }
 

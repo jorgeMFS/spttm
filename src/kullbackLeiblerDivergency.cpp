@@ -13,7 +13,7 @@ void KullbackLeiblerDivergency::init(){
     auto target_vector = readtarget.get_input_vector_as_unsigned_int();
     bool print_bool = false;
     mk_target_vector = target.get_models(args, target_vector , print_bool);
-
+    target_lenght = mk_target_vector[0].sum_all_elem();
 }
 
 void KullbackLeiblerDivergency::run_w_input_file(){

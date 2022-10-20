@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <unordered_set>
+
 #include "node.h"
 #include "search.h"
 #include "util.h"
@@ -34,7 +35,8 @@ void Search::init(){
        results = MonteCarloSearchMulticore();
     } 
     else if(std::strcmp(args.search_strategy, "Tree_Search")==0){
-      results = TreeSearchMulticore();
+       results = TreeSearchMulticore();
+       //TreeSearch(traversal_len, 42,0);
     }
     else if(std::strcmp(args.search_strategy, "Neural_Networks") == 0){
         std::cout << "ERROR ERROR" << std::endl;
@@ -212,6 +214,19 @@ std::unordered_map<std::string, double> Search::SequentialSearchMulticore(){
     }
   return unordered_map;
 }
+/*
+bool ThreadSafeUnorderedSet::safe_insert(std::string str){
+
+  // thread1 -> aaa
+  // #2 -> aaa
+  this->visitedNodesSync.lock();
+
+  bool result = this->visitedNodes.insert(str).second;
+  // true #1 _ false #2
+  this->visitedNodesSync.unlock();
+  // false #2 - #1 true
+  return result;
+}*/
 
 
 std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
@@ -224,6 +239,16 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
   TmId partition_len = div128by32(traversal_len, args.jobs);
   TmId partition_rest = traversal_len % args.jobs;
 
+  std::vector<unsigned int> seedPerTheard;
+  seedPerTheard.push_back((prime * seed) % 4079);
+
+  // 
+  for (auto i = 0u; i < args.jobs-1; ++i) {
+    seedPerTheard.push_back((prime * seedPerTheard[i]) % 4079);
+  }
+
+  
+
   // spawn  tasks asynchronously
   std::vector<std::future<std::vector<std::pair<std::string, double>>>> works;
   for (auto i = 0u; i < args.jobs; ++i) {
@@ -235,9 +260,8 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
 
     works.push_back(std::async([=]() {
         std::cerr << "Worker #" << i << " TMs to test :"  <<  len <<  "..." << std::endl;
-        seed = (prime * seed) % 4079;
-        std::cerr << "seed =>" << seed<< std::endl;
-        auto o = TreeSearch(len);
+        
+        auto o = TreeSearch(len, seedPerTheard[i], i);
         std::cerr << "Worker #" << i << " finished" << std::endl;
         return o;
     }));
@@ -258,49 +282,60 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
   return unordered_map;
 }
 
-std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_length){
+std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_length, unsigned int randSeed, unsigned int threadId){
   AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
   std::vector<std::pair<std::string, double>> tm_data;
-  std::unordered_set<std::string>visitedNodes;
+  std::unordered_set<std::string> visitedNodes;
   std::priority_queue<RuleMatrixNode> nodesToOpen;
+
+  std::unordered_set<std::string> DEBUG_VECTOR;
 
   std::vector<TuringRecord> possibleRules = get_possible_rules(args.states,args.alphabet_size);
   unsigned int counter=0u;
   // Add the starting rule to the nodes to open
   double loss;
-  const double RAND_MAX_MACHINES=10u;
+  const double RAND_MAX_MACHINES=1u;
   //const double RAND_MAX_MACHINES=1u;
 
   // multiple samples for better initialization
+  std::cerr << "seed =>" << randSeed<< " Worker: " << threadId << "                   |" << std::endl;
+  std::minstd_rand rng{randSeed};
+
   for (auto i=0u;i<RAND_MAX_MACHINES;i++){
 
-    std::minstd_rand rng{seed};
-    
-    if(seed==0){
-      thread_local std::random_device rd_dev{};
-      thread_local std::seed_seq seq{rd_dev(), rd_dev(), rd_dev(), rd_dev()};
-      thread_local std::mt19937 rng(seq);
-    }
-
-    thread_local StateMatrix st(args.states, args.alphabet_size, rng);
+    StateMatrix st(args.states, args.alphabet_size);
+    st.set_random(rng);
     loss = test_machine(st,all_models);
     RuleMatrixNode startNode(st.get_state_matrix_string(), loss);
+    
     nodesToOpen.push(startNode);
-    visitedNodes.insert(startNode.identifier);
+    //auto r = visitedNodes.insert(startNode.identifier).second;
+    //std::cerr << "loss =>" << loss<< " Worker: " << threadId << " new? " << startNode.identifier <<"                   |" << std::endl;
   }
-
+  unsigned int numberPossibleSucessors = ((args.states*args.alphabet_size*3)-1)*(args.states*args.alphabet_size);
+  unsigned int minNumberSucessors = 1000;// get from args
  // std::uniform_int_distribution<int>  distr(range_from, range_to);
-
+  std::vector<StateMatrix> sucessors;
   auto i=0u;
   std::cerr<<"search :"<<traversal_length<<std::endl;
-  while((!nodesToOpen.empty()) && (i<traversal_length)) { // || 
+  while((!nodesToOpen.empty()) && (i<traversal_length) && (found_program==false)) { // || 
     auto currentNode = nodesToOpen.top();
     nodesToOpen.pop();
+    if (!DEBUG_VECTOR.insert(currentNode.identifier).second){
+        std::cerr<< "DEBUG! THIS THIS CANNOT HAPPEN WTFF HOWWWW???"<<std::endl;
+      //std::cerr.flush();
+    }
     ++counter;
-    
 
     StateMatrix st(currentNode.identifier, args.states, args.alphabet_size);
-    auto sucessors = generate_random_sucessors(st,possibleRules,1000);          
+    
+    if (numberPossibleSucessors<minNumberSucessors){
+      sucessors = generate_sucessors(st,possibleRules);
+    }else{
+      sucessors = generate_random_sucessors(st,possibleRules, minNumberSucessors, currentNode.cost);
+    }
+    //std::cerr<< "How many? "<< sucessors.size()<< " loss " <<currentNode.cost <<std::endl;
+
     for(auto&sucessor: sucessors){  
       if( visitedNodes.insert(sucessor.get_state_matrix_string()).second){
         loss = test_machine(sucessor,all_models);
@@ -316,13 +351,13 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
           }
         }
 
-        if(! (i++ % 1000)){std::cerr<<"counter: "<<counter<< " i : "<< i <<std::endl;
-          std::cerr<< "St. String :"<< currentNode.identifier <<"; Cost : " <<currentNode.cost <<std::endl;
-        } 
+        if((i++ % 1000)==0){//std::cerr<<"counter: "<<counter<< " i : "<< i << " Worker: "<< threadId<<std::endl;
+          //std::cerr<< "St. String :"<< currentNode.identifier <<"; Cost : " <<currentNode.cost<< " Worker: "<< threadId <<std::endl;
+          std::cerr<<"Cost : " <<currentNode.cost<< " T machines " << i << " Worker: "<< threadId <<std::endl;
+        }
         RuleMatrixNode newNode(sucessor.get_state_matrix_string(), loss);
         nodesToOpen.push(newNode);
       }
-
     }
   }
   std::cerr<<"counter: "<<counter<<std::endl;
@@ -364,3 +399,4 @@ unsigned __int128 div128by32(unsigned __int128 x, uint64_t y)
 {
     return x/y;
 }
+

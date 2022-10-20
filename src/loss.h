@@ -21,9 +21,11 @@ struct Loss{
     
     public:
         double compute_loss(std::vector<MarkovTable> &mkv_table_vector);
+                
     private:
         double w;
         KullbackLeiblerDivergency kl;
         double average_divergence_vector(std::vector<double> &divergence_vector);
+        double length_penalizer(MarkovTable &mkv_table);
 };
 

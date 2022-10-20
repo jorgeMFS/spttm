@@ -411,8 +411,7 @@ StateMatrix determine_last_state_Matrix(const unsigned int& number_of_states, co
 
 std::vector<StateMatrix> generate_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules){
   std::vector<StateMatrix> successors;
-  unsigned int number_states=st.get_number_states();
-  unsigned int alphabet_size=st.get_alphabet();
+
   unsigned int st_size=st.get_state_matrix_size();
   for(auto it=0u; it <st_size; ++it){
     auto current_record = st.get_element(it);
@@ -427,33 +426,30 @@ std::vector<StateMatrix> generate_sucessors(StateMatrix &st, std::vector<TuringR
     }  
   }
 
-  assert(successors.size() == ((number_states*alphabet_size*3)-1)*st_size);
+  assert(successors.size() == ((st_size*3)-1)*st_size);
 
   return successors;
 }
 
-std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules, unsigned int number_outputs){
-  std::vector<StateMatrix> successors;
-  unsigned int number_states=st.get_number_states();
-  unsigned int alphabet_size=st.get_alphabet();
+std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules, unsigned int nMin, double loss_value){
+  
+  auto successors = generate_sucessors(st, possible_rules);
+
   unsigned int st_size=st.get_state_matrix_size();
-  for(auto it=0u; it <st_size; ++it){
-    auto current_record = st.get_element(it);
-    for(auto j=0u; j <possible_rules.size(); ++j) {
-      StateMatrix new_st(st);
-      auto cmp_record=possible_rules[j];
-      if(!(current_record==cmp_record)){
-        // swap
-        new_st.set_rule(it, cmp_record);
-        successors.push_back(new_st);
-      } 
-    }  
+  unsigned int number_outputs=nMin;
+
+  // magic stuff
+  auto nMac = (((st_size*3)-1)*st_size);///3;
+
+  if (loss_value>=0.1){
+    number_outputs = nMin;
+  }else{
+    number_outputs = static_cast<unsigned int>(std::round(-pow(10*sqrt((nMac-nMin))*loss_value,2)+nMac));
   }
   
   std::vector<StateMatrix> output_random_sucessors;
   
-  assert(successors.size() == ((number_states*alphabet_size*3)-1)*st_size);
-
+  // this injures the reproducibility
   std::sample(successors.begin(), successors.end(), std::back_inserter(output_random_sucessors), number_outputs, std::mt19937{std::random_device{}()});
 
   return output_random_sucessors;
