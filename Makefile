@@ -16,14 +16,9 @@ objects = src/tmId.o \
  		  src/main.o
 
 objects2 = src/tmId.o \
-		  src/turingMachine.o \
-		  src/interactiveMarkovModel.o \
-		  src/stringProcess.o \
-		  src/markovTable.o \
-		  src/parseArgs.o \
 		  src/util.o \
-		  src/sptm.o \
-		  src/read_input.o \
+		  src/turingMachine.o \
+		  src/parseArgs.o \
  		  src/main2.o 
 
 objects3 = src/tmId.o \
@@ -149,11 +144,11 @@ src/parseArgs.o: src/parseArgs.cpp src/parseArgs.h src/util.h
 
 src/search.o: src/search.cpp src/search.h src/loss.h src/node.h
 
-src/read_input.o: src/read_input.cpp src/read_input.h 
-
 src/sptm.o: src/sptm.cpp src/sptm.h 
 
 src/stringProcess.o: src/stringProcess.cpp src/stringProcess.h src/markovTable.h src/interactiveMarkovModel.h
+
+src/read_input.o: src/read_input.cpp src/read_input.h 
 
 src/turingMachine.o: src/turingMachine.cpp src/turingMachine.h src/tmId.h
 

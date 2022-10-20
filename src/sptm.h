@@ -31,6 +31,6 @@ struct sptm{
     std::vector<double> perc_diff_elems(std::vector<double> const & v1, std::vector<double> const & v2);
     std::pair<double, double>  hit_score_and_dist(std::vector<unsigned int> const & v1, std::vector<unsigned int> const & v2);
 };
-    std::tuple<StateMatrix, unsigned long long, std::vector<unsigned int>, double, unsigned int>read_file();
     double hit_score(std::vector<unsigned int> const & v1, std::vector<unsigned int> const & v2);
     std::vector<unsigned int >parse_context(std::string context_string);
+    std::tuple<StateMatrix, unsigned long long, std::vector<unsigned int>, double, unsigned int> read_file() ;

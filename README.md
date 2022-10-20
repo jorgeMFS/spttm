@@ -26,7 +26,12 @@ Flags to run code:
 -n: max. number of machines to test
 -j: number of threads
 ```
-  
+
+Example of running run:
+```
+./run   -f "A"
+```
+
 Example of running sptm:
 ```
 ./sptm   -e 555 -s 2 -a 2 -i 100 -A 20 -k 2 -f "A" -o 20
