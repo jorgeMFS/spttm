@@ -25,28 +25,40 @@
 
 struct ThreadSafeUnorderedSet
 {
-  std::unordered_set<std::string> visitedNodes;
+  std::unordered_set<std::string> visitedNodesSet;
   std::mutex visitedNodesSync;
 
   bool safe_insert(std::string str);
   bool contains(std::string str);
 };
 
+struct TopKResults
+{
+  std::priority_queue<std::pair<std::string, double>> topFoundResults;
+  unsigned int maxSize;
+
+  TopKResults(unsigned int maxSize);
+  std::vector<std::pair<std::string, double>> to_vector();
+  void add(std::pair<std::string, double> result);
+
+};
+
 struct Search{
     
-    Args args;
-    Loss loss;
-    TmId traversal_len;
-    unsigned int seed;
-    ThreadSafeUnorderedSet visitedNodes;
-    bool found_program=false;
-    unsigned int file_counter=0;
-    unsigned int prime = 65519;
+    
 
     Search(Args args, double weight);
     
     private:
-        void init();
+        Args args;
+        Loss loss;
+        TmId traversal_len;
+        unsigned int seed;
+        ThreadSafeUnorderedSet visitedNodes;
+        bool found_program=false;
+        unsigned int file_counter=0;
+        unsigned int prime = 65519;
+        
         std::unordered_map<std::string, double> SequentialSearchMulticore();
         std::unordered_map<std::string, double> MonteCarloSearchMulticore();
         std::unordered_map<std::string, double> TreeSearchMulticore();
@@ -58,6 +70,9 @@ struct Search{
         double test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models);
 
         void write_to_file(std::unordered_map<std::string, double> results);
+
+    public:
+      void init();
 
 };
 unsigned __int128 div128by32(unsigned __int128 x, uint64_t y);

@@ -19,7 +19,7 @@ Search::Search(Args args, double weight): args(args),loss(args,weight),traversal
     if (args.traversal_len==0 || args.traversal_len> max_value){
         traversal_len=max_value;
     }
-    init();
+    //init();
 }
 
 void Search::init(){
@@ -43,6 +43,7 @@ void Search::init(){
         exit(-1); // fix latter
     }
     write_to_file(results);
+
 }
 
 std::vector<std::pair<std::string, double>> Search::SequentialSearch(TmId traversal_length, TmId traversal_offset){
@@ -215,13 +216,35 @@ std::unordered_map<std::string, double> Search::SequentialSearchMulticore(){
   return unordered_map;
 }
 
+TopKResults::TopKResults(unsigned int maxSize): maxSize(maxSize){}
+
+void TopKResults::add(std::pair<std::string, double> result){
+  if (this->topFoundResults.size()>=this->maxSize){
+    this->topFoundResults.pop();
+  }
+  this->topFoundResults.push(result);
+}
+
+std::vector<std::pair<std::string, double>> TopKResults::to_vector(){
+
+  std::vector<std::pair<std::string, double>> data;
+  for (auto i=0u; i<this->topFoundResults.size();i++){
+    data.push_back(this->topFoundResults.top());
+    this->topFoundResults.pop();
+  }
+
+  return data;
+}
+
+
+
 bool ThreadSafeUnorderedSet::safe_insert(std::string str){
 
   // thread1 -> aaa
   // #2 -> aaa
   this->visitedNodesSync.lock();
 
-  bool result = this->visitedNodes.insert(str).second;
+  bool result = this->visitedNodesSet.insert(str).second;
   // true #1 _ false #2
   this->visitedNodesSync.unlock();
   // false #2 - #1 true
@@ -229,7 +252,13 @@ bool ThreadSafeUnorderedSet::safe_insert(std::string str){
 }
 
 bool ThreadSafeUnorderedSet::contains(std::string str){
-  return this->visitedNodes.count(str)==1;
+  return this->visitedNodesSet.count(str)==1;
+}
+
+
+bool comparePair(std::pair<std::string, double> i1, std::pair<std::string, double>  i2)
+{
+    return (i1.second < i2.second);
 }
 
 std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
@@ -249,8 +278,6 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
   for (auto i = 0u; i < args.jobs-1; ++i) {
     seedPerTheard.push_back((prime * seedPerTheard[i]) % 4079);
   }
-
-  
 
   // spawn  tasks asynchronously
   std::vector<std::future<std::vector<std::pair<std::string, double>>>> works;
@@ -275,14 +302,16 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
 
   for (auto& f: works) {
     auto r = f.get();
-    //total.insert(end(total), begin(std::move(r)), end(std::move(r)));
+    total.insert(end(total), begin(std::move(r)), end(std::move(r)));
   }
-  exit(-9);
+
+  
 
   std::unordered_map<std::string, double> unordered_map;
     for(auto &pair:total){
         unordered_map.insert (pair);
     }
+    
   return unordered_map;
 }
 
@@ -292,17 +321,16 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
   unsigned int current_patience = 0u;
 
   AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
-  std::vector<std::pair<std::string, double>> tm_data;
   //std::unordered_set<std::string> visitedNodes;
   std::priority_queue<RuleMatrixNode> nodesToOpen;
-
+  TopKResults topKresult(10);
   //std::unordered_set<std::string> DEBUG_VECTOR;
 
   std::vector<TuringRecord> possibleRules = get_possible_rules(args.states,args.alphabet_size);
   unsigned int counter=0u;
   // Add the starting rule to the nodes to open
   double loss;
-  const double RAND_MAX_MACHINES=1u;
+  const double RAND_MAX_MACHINES=10u;
   //const double RAND_MAX_MACHINES=1u;
 
   // multiple samples for better initialization
@@ -330,28 +358,30 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
     auto currentNode = nodesToOpen.top();
     nodesToOpen.pop();
     visitedNodes.safe_insert(currentNode.identifier);
+    topKresult.add(std::pair<std::string, double>(currentNode.identifier, currentNode.cost));
     
     if (last_loss==currentNode.cost && currentNode.cost>args.threshold){
       if (current_patience++>MAX_PATIENCE){
-        StateMatrix st(args.states, args.alphabet_size);
-        st.set_random(rng);
-        RuleMatrixNode newGenNode(st.get_state_matrix_string(), test_machine(st,all_models));
-
-        while (!visitedNodes.safe_insert(newGenNode.identifier)){
-          st.set_random(rng);
-          newGenNode = RuleMatrixNode(st.get_state_matrix_string(), test_machine(st,all_models));
-        }
-
         nodesToOpen = std::priority_queue<RuleMatrixNode>();
         std::cerr << bold_on << red_on << "Run out of patience | worker: " << threadId << bold_off << std::endl;
+        for (auto i=0u;i<RAND_MAX_MACHINES;i++){
+          StateMatrix st(args.states, args.alphabet_size);
+          st.set_random(rng);
+          RuleMatrixNode newGenNode(st.get_state_matrix_string(), test_machine(st,all_models));
 
-        nodesToOpen.push(newGenNode);
+          while (!visitedNodes.safe_insert(newGenNode.identifier)){
+            st.set_random(rng);
+            newGenNode = RuleMatrixNode(st.get_state_matrix_string(), test_machine(st,all_models));
+          }
+          nodesToOpen.push(newGenNode);
+        }
 
         current_patience = 0u;
         continue;
       }
     }else{
       last_loss = currentNode.cost;
+      current_patience = 0u;
     }
 
     ++counter;
@@ -365,23 +395,26 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
     }
     //std::cerr<< "How many? "<< sucessors.size()<< " loss " <<currentNode.cost <<std::endl;
 
-    for(auto&sucessor: sucessors){  
+    for(auto&sucessor: sucessors){ 
+      if (found_program) break;
       if(!visitedNodes.contains(sucessor.get_state_matrix_string()) ){
         
         loss = test_machine(sucessor,all_models);
-
         if(loss<args.threshold) {
-          tm_data.push_back(std::pair<std::string, double>(sucessor.get_state_matrix_string(), loss));
+          
           if(loss==0){
             std::cerr<< bold_on  << green_on <<"Found SOLUTION !!"<<bold_off<<std::endl;
             std::cerr<< bold_on  << green_on <<"Number of machines ran " << i+RAND_MAX_MACHINES <<" | Number of nodes open "<< counter<<bold_off<<std::endl;
             std::cerr<< sucessor.get_state_matrix_string()<<std::endl;
             found_program=true;
-            return tm_data;
+            // converting a priority_queue to a vector to keep the same API
+            // It would be more efficient to define iterators in the API
+            
+            return topKresult.to_vector();
           }
         }
 
-        if((i++ % 1000)==0){//std::cerr<<"counter: "<<counter<< " i : "<< i << " Worker: "<< threadId<<std::endl;
+        if((i++ % 100000)==0){//std::cerr<<"counter: "<<counter<< " i : "<< i << " Worker: "<< threadId<<std::endl;
           //std::cerr<< "St. String :"<< currentNode.identifier <<"; Cost : " <<currentNode.cost<< " Worker: "<< threadId <<std::endl;
           std::cerr<<"Cost : " <<currentNode.cost<< " T machines " << i << " Worker: "<< threadId <<std::endl;
         }
@@ -391,11 +424,21 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
     }
   }
   std::cerr<<"counter: "<<counter<<std::endl;
-  return tm_data;
+  return topKresult.to_vector();
 }
 
 void Search::write_to_file(std::unordered_map<std::string, double> results){
+
+    std::vector<std::pair<std::string, double>> total;
+
+    for (auto &el: results){
+      total.push_back(el);
+    } 
+
+    std::sort(total.begin(), total.end(), comparePair);
+
     if(results.empty()){return;}
+
     auto alphabet_subfolder=std::to_string(args.alphabet_size);
     auto state_subfolder=std::to_string(args.states);
     auto search_mode_subfolder=args.search_strategy;
@@ -405,7 +448,7 @@ void Search::write_to_file(std::unordered_map<std::string, double> results){
     std::filesystem::create_directories(path);
     std::string file = path + args.target_file;
     std::ofstream outFile(file);
-    for (auto &el: results){
+    for (auto &el: total){
         outFile  << el.first << "\t" << el.second << std::endl;
     }
 }
