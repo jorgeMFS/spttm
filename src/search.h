@@ -19,17 +19,17 @@
 #include "interactiveMarkovModel.h"
 #include "parseArgs.h"
 #include "loss.h"
-//#include <unordered_set>
-//#include <mutex>
+#include <unordered_set>
+#include <mutex>
 #include <unordered_map>
-/*
+
 struct ThreadSafeUnorderedSet
 {
   std::unordered_set<std::string> visitedNodes;
   std::mutex visitedNodesSync;
 
   bool safe_insert(std::string str);
-};*/
+};
 
 struct Search{
     
@@ -37,7 +37,7 @@ struct Search{
     Loss loss;
     TmId traversal_len;
     unsigned int seed;
-    //ThreadSafeUnorderedSet visitedNodes;
+    ThreadSafeUnorderedSet visitedNodes;
     bool found_program=false;
     unsigned int file_counter=0;
     unsigned int prime = 65519;

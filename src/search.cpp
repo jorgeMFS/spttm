@@ -7,7 +7,7 @@
 #include <thread>
 #include <string>
 #include <sstream>
-#include <unordered_set>
+//#include <unordered_set>
 
 #include "node.h"
 #include "search.h"
@@ -214,7 +214,7 @@ std::unordered_map<std::string, double> Search::SequentialSearchMulticore(){
     }
   return unordered_map;
 }
-/*
+
 bool ThreadSafeUnorderedSet::safe_insert(std::string str){
 
   // thread1 -> aaa
@@ -226,7 +226,7 @@ bool ThreadSafeUnorderedSet::safe_insert(std::string str){
   this->visitedNodesSync.unlock();
   // false #2 - #1 true
   return result;
-}*/
+}
 
 
 std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
@@ -272,8 +272,9 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
 
   for (auto& f: works) {
     auto r = f.get();
-    total.insert(end(total), begin(std::move(r)), end(std::move(r)));
+    //total.insert(end(total), begin(std::move(r)), end(std::move(r)));
   }
+  exit(-9);
 
   std::unordered_map<std::string, double> unordered_map;
     for(auto &pair:total){
@@ -283,12 +284,16 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
 }
 
 std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_length, unsigned int randSeed, unsigned int threadId){
+
+  const unsigned int MAX_PATIENCE = 20u;
+  unsigned int current_patience = 0u;
+
   AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
   std::vector<std::pair<std::string, double>> tm_data;
-  std::unordered_set<std::string> visitedNodes;
+  //std::unordered_set<std::string> visitedNodes;
   std::priority_queue<RuleMatrixNode> nodesToOpen;
 
-  std::unordered_set<std::string> DEBUG_VECTOR;
+  //std::unordered_set<std::string> DEBUG_VECTOR;
 
   std::vector<TuringRecord> possibleRules = get_possible_rules(args.states,args.alphabet_size);
   unsigned int counter=0u;
@@ -305,15 +310,15 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
 
     StateMatrix st(args.states, args.alphabet_size);
     st.set_random(rng);
-    loss = test_machine(st,all_models);
-    RuleMatrixNode startNode(st.get_state_matrix_string(), loss);
+    RuleMatrixNode startNode(st.get_state_matrix_string(), test_machine(st,all_models));
     
     nodesToOpen.push(startNode);
-    //auto r = visitedNodes.insert(startNode.identifier).second;
+    visitedNodes.safe_insert(startNode.identifier);
     //std::cerr << "loss =>" << loss<< " Worker: " << threadId << " new? " << startNode.identifier <<"                   |" << std::endl;
   }
   unsigned int numberPossibleSucessors = ((args.states*args.alphabet_size*3)-1)*(args.states*args.alphabet_size);
   unsigned int minNumberSucessors = 1000;// get from args
+  double last_loss = 9999999.9;
  // std::uniform_int_distribution<int>  distr(range_from, range_to);
   std::vector<StateMatrix> sucessors;
   auto i=0u;
@@ -321,10 +326,30 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
   while((!nodesToOpen.empty()) && (i<traversal_length) && (found_program==false)) { // || 
     auto currentNode = nodesToOpen.top();
     nodesToOpen.pop();
-    if (!DEBUG_VECTOR.insert(currentNode.identifier).second){
-        std::cerr<< "DEBUG! THIS THIS CANNOT HAPPEN WTFF HOWWWW???"<<std::endl;
-      //std::cerr.flush();
+    
+    if (last_loss==currentNode.cost && currentNode.cost>args.threshold){
+      if (current_patience++>MAX_PATIENCE){
+        StateMatrix st(args.states, args.alphabet_size);
+        st.set_random(rng);
+        RuleMatrixNode newGenNode(st.get_state_matrix_string(), test_machine(st,all_models));
+
+        while (!visitedNodes.safe_insert(newGenNode.identifier)){
+          st.set_random(rng);
+          newGenNode = RuleMatrixNode(st.get_state_matrix_string(), test_machine(st,all_models));
+        }
+
+        nodesToOpen = std::priority_queue<RuleMatrixNode>();
+        std::cerr << bold_on << red_on << "Run out of patience | worker: " << threadId << bold_off << std::endl;
+
+        nodesToOpen.push(newGenNode);
+
+        current_patience = 0u;
+        continue;
+      }
+    }else{
+      last_loss = currentNode.cost;
     }
+
     ++counter;
 
     StateMatrix st(currentNode.identifier, args.states, args.alphabet_size);
@@ -337,7 +362,7 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
     //std::cerr<< "How many? "<< sucessors.size()<< " loss " <<currentNode.cost <<std::endl;
 
     for(auto&sucessor: sucessors){  
-      if( visitedNodes.insert(sucessor.get_state_matrix_string()).second){
+      if( visitedNodes.safe_insert(sucessor.get_state_matrix_string())){
         loss = test_machine(sucessor,all_models);
 
         if(loss<args.threshold) {
