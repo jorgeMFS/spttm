@@ -228,6 +228,9 @@ bool ThreadSafeUnorderedSet::safe_insert(std::string str){
   return result;
 }
 
+bool ThreadSafeUnorderedSet::contains(std::string str){
+  return this->visitedNodes.count(str)==1;
+}
 
 std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
 // split work in partitions
@@ -285,7 +288,7 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
 
 std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_length, unsigned int randSeed, unsigned int threadId){
 
-  const unsigned int MAX_PATIENCE = 20u;
+  const unsigned int MAX_PATIENCE = 40u;
   unsigned int current_patience = 0u;
 
   AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
@@ -326,6 +329,7 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
   while((!nodesToOpen.empty()) && (i<traversal_length) && (found_program==false)) { // || 
     auto currentNode = nodesToOpen.top();
     nodesToOpen.pop();
+    visitedNodes.safe_insert(currentNode.identifier);
     
     if (last_loss==currentNode.cost && currentNode.cost>args.threshold){
       if (current_patience++>MAX_PATIENCE){
@@ -362,7 +366,8 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
     //std::cerr<< "How many? "<< sucessors.size()<< " loss " <<currentNode.cost <<std::endl;
 
     for(auto&sucessor: sucessors){  
-      if( visitedNodes.safe_insert(sucessor.get_state_matrix_string())){
+      if(!visitedNodes.contains(sucessor.get_state_matrix_string()) ){
+        
         loss = test_machine(sucessor,all_models);
 
         if(loss<args.threshold) {

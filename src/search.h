@@ -29,6 +29,7 @@ struct ThreadSafeUnorderedSet
   std::mutex visitedNodesSync;
 
   bool safe_insert(std::string str);
+  bool contains(std::string str);
 };
 
 struct Search{
