@@ -7,7 +7,6 @@
 #include <thread>
 #include <string>
 #include <sstream>
-//#include <unordered_set>
 
 #include "node.h"
 #include "search.h"
