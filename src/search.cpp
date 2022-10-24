@@ -447,9 +447,10 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
         continue;
       }
     }else{
-      last_loss = currentNode.cost;
       current_patience = 0u;
     }
+
+    last_loss = currentNode.cost;
 
     ++counter;
 
@@ -458,7 +459,7 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
     if (numberPossibleSucessors<minNumberSucessors){
       sucessors = generate_sucessors(st,possibleRules);
     }else{
-      sucessors = generate_random_sucessors(st,possibleRules, minNumberSucessors, currentNode.cost);
+      sucessors = generate_random_sucessors(st,possibleRules, currentNode.cost);
     }
     //std::cerr<< "How many? "<< sucessors.size()<< " loss " <<currentNode.cost <<std::endl;
 

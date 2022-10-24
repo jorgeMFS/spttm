@@ -431,21 +431,18 @@ std::vector<StateMatrix> generate_sucessors(StateMatrix &st, std::vector<TuringR
   return successors;
 }
 
-std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules, unsigned int nMin, double loss_value){
-  
+std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules, double loss_value){
   auto successors = generate_sucessors(st, possible_rules);
 
   unsigned int st_size=st.get_state_matrix_size();
-  unsigned int number_outputs=nMin;
 
   // magic stuff
-  auto nMac = (((st_size*3)-1)*st_size);///3;
+  auto nMac = (((st_size*3)-1)*st_size);
+  auto nMin = nMac*0.1;
 
-  if (loss_value>=0.1){
-    number_outputs = nMin;
-  }else{
-    number_outputs = static_cast<unsigned int>(std::round(-pow(10*sqrt((nMac-nMin))*loss_value,2)+nMac));
-  }
+  unsigned int number_outputs = static_cast<unsigned int>(2/loss_value + nMin);
+
+  number_outputs = std::min(nMac, number_outputs);
   
   std::vector<StateMatrix> output_random_sucessors;
   

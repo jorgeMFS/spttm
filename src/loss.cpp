@@ -50,7 +50,7 @@ double Loss::compute_loss(std::vector<MarkovTable> &mkv_table_vector){
         // add penalty when lenght of the tapes differ
 
 
-        return (conditional_divergence*w)+(seq_string_divergence*(1-w)) + length_penalizer(mkv_table_vector[0]);
+        return (conditional_divergence*w)+(seq_string_divergence*(1-w)) + 0.01*length_penalizer(mkv_table_vector[0]);
     }
 }
 

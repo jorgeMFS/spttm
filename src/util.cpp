@@ -40,6 +40,8 @@ std::ostream& red_on(std::ostream& os){
 }
 
 unsigned int compute_max_patience(double current_loss, unsigned int default_patience){
+  //auto t = static_cast<unsigned int>(1/(2*current_loss) + default_patience);
+  //std::cerr << t << " loss " << current_loss << " default " << default_patience << std::endl;
   return static_cast<unsigned int>(1/(2*current_loss) + default_patience);
 }
 
