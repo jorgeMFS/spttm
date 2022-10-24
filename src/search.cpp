@@ -427,8 +427,8 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
     topKresult.add(std::pair<double, std::string>(currentNode.cost, currentNode.identifier));
     //std::cerr<< "Hip: topResults size "<< topKresult.topFoundResults.size() << std::endl;
     
-    if (last_loss==currentNode.cost && currentNode.cost>args.threshold){
-      if (current_patience++>MAX_PATIENCE){
+    if (last_loss>=currentNode.cost){
+      if (current_patience++>compute_max_patience(currentNode.cost, MAX_PATIENCE)){
         nodesToOpen = std::priority_queue<RuleMatrixNode>();
         std::cerr << bold_on << red_on << "Run out of patience | worker: " << threadId << bold_off << std::endl;
         for (auto i=0u;i<RAND_MAX_MACHINES;i++){
@@ -478,6 +478,7 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
             found_program=true;
             // converting a priority_queue to a vector to keep the same API
             // It would be more efficient to define iterators in the API
+            topKresult.add(std::pair<double, std::string>(loss, sucessor.get_state_matrix_string()));
             std::cerr<< "At exit time: "<< topKresult.topFoundResults.size() << std::endl;
             return topKresult.to_vector();
           }

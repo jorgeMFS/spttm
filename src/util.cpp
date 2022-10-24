@@ -39,6 +39,10 @@ std::ostream& red_on(std::ostream& os){
     return os << "\e[31m";
 }
 
+unsigned int compute_max_patience(double current_loss, unsigned int default_patience){
+  return static_cast<unsigned int>(1/(2*current_loss) + default_patience);
+}
+
 void set_output( const std::string& name, const double& value){
     std::cerr << bold_on << cyan_on <<name << ": " << bold_off;  
     std::cerr << bold_on << value << bold_off << std::endl;

@@ -53,6 +53,8 @@ void set_output(const std::string& name, const double& value);
 void set_output_units(const std::string& name, const double& value, const std::string& units);
 void draw_line();
 
+unsigned int compute_max_patience(double current_loss, unsigned int default_patience);
+
 // Returns random boolean (0,1)
 bool randomBool();
 
