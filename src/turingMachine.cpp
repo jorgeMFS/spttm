@@ -438,7 +438,7 @@ std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<
 
   // magic stuff
   auto nMac = (((st_size*3)-1)*st_size);
-  auto nMin = nMac*0.1;
+  auto nMin = log2(nMac+1)*100;
 
   unsigned int number_outputs = static_cast<unsigned int>(2/loss_value + nMin);
 
