@@ -19,6 +19,7 @@
 #include "interactiveMarkovModel.h"
 #include "parseArgs.h"
 #include "loss.h"
+#include "node.h"
 #include <unordered_set>
 #include <mutex>
 #include <unordered_map>
@@ -35,12 +36,12 @@ struct ThreadSafeUnorderedSet
 
 struct TopKResults
 {
-  std::priority_queue<std::pair<std::string, double>> topFoundResults;
+  std::priority_queue<std::pair<double, std::string>> topFoundResults;
   unsigned int maxSize;
 
   TopKResults(unsigned int maxSize);
   std::vector<std::pair<std::string, double>> to_vector();
-  void add(std::pair<std::string, double> result);
+  void add(std::pair<double, std::string> result);
 
 };
 
@@ -69,6 +70,8 @@ struct Search{
         std::vector<std::pair<std::string, double>> SequentialSearch(TmId traversal_length, TmId traversal_offset);
         std::vector<std::pair<std::string, double>> MonteCarloSearch(TmId traversal_length);
         double test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models);
+        std::pair<double, double> test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short, RuleMatrixNode father_node);
+        std::pair<double, double> test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short);
 
         void write_to_file(std::unordered_map<std::string, double> results);
 

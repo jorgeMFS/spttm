@@ -3,6 +3,10 @@
 
 RuleMatrixNode::RuleMatrixNode(const std::string &st_str, const double &cost):identifier(st_str),cost(cost){}
 
+RuleMatrixNode::RuleMatrixNode(const std::string &st_str, const double &cost, const double &short_cost):identifier(st_str),cost(cost),short_cost(short_cost){}
+
+RuleMatrixNode::RuleMatrixNode(const std::string &st_str, const std::pair<double, double> &costs):identifier(st_str), cost(costs.first), short_cost(costs.second){}
+
 bool RuleMatrixNode::operator==(const RuleMatrixNode &tr) const {
     return (identifier == tr.identifier);
 }

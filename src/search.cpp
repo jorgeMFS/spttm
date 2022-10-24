@@ -8,7 +8,6 @@
 #include <string>
 #include <sstream>
 
-#include "node.h"
 #include "search.h"
 #include "util.h"
 
@@ -78,12 +77,62 @@ double Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<Interacti
     
     TuringMachine tm(st);
     all_models.reset();
+    
     for (auto i = 0u; i < args.tape_iterations ; ++i){
+        TapeMoves tpMove = tm.act(); 
+        all_models.update_tables(tpMove, tm.turingTape);
+    }
+
+    std::vector<MarkovTable> mkv_vector=all_models.get_markov_tables();
+    return loss.compute_loss(mkv_vector);
+}
+
+std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short, RuleMatrixNode father_node) {
+    
+    TuringMachine tm(st);
+    all_models.reset();
+    for (auto i = 0u; i < tapes_iter_short ; ++i){
         TapeMoves tpMove = tm.act(); // grave esti antaŭe
         all_models.update_tables(tpMove, tm.turingTape);
     }
+
     std::vector<MarkovTable> mkv_vector=all_models.get_markov_tables();
-    return loss.compute_loss(mkv_vector);
+    double son_short_loss = loss.compute_loss(mkv_vector);
+
+    if (father_node.short_cost==son_short_loss){
+      return std::pair<double, double> (father_node.cost * 1.01, son_short_loss);
+    }
+
+    // 
+    for (auto i = tapes_iter_short; i < args.tape_iterations ; ++i){
+        TapeMoves tpMove = tm.act(); 
+        all_models.update_tables(tpMove, tm.turingTape);
+    }
+
+    mkv_vector=all_models.get_markov_tables();
+    return std::pair<double, double> (loss.compute_loss(mkv_vector), son_short_loss);
+}
+
+std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short) {
+    
+    TuringMachine tm(st);
+    all_models.reset();
+    for (auto i = 0u; i < tapes_iter_short ; ++i){
+        TapeMoves tpMove = tm.act(); // grave esti antaŭe
+        all_models.update_tables(tpMove, tm.turingTape);
+    }
+
+    std::vector<MarkovTable> mkv_vector=all_models.get_markov_tables();
+    double short_loss = loss.compute_loss(mkv_vector);
+
+    // 
+    for (auto i = tapes_iter_short; i < args.tape_iterations ; ++i){
+        TapeMoves tpMove = tm.act(); 
+        all_models.update_tables(tpMove, tm.turingTape);
+    }
+
+    mkv_vector=all_models.get_markov_tables();
+    return std::pair<double, double> (loss.compute_loss(mkv_vector), short_loss);
 }
 
 std::vector<std::pair<std::string, double>> Search::MonteCarloSearch(TmId traversal_length){
@@ -217,7 +266,7 @@ std::unordered_map<std::string, double> Search::SequentialSearchMulticore(){
 
 TopKResults::TopKResults(unsigned int maxSize): maxSize(maxSize){}
 
-void TopKResults::add(std::pair<std::string, double> result){
+void TopKResults::add(std::pair<double, std::string> result){
   if (this->topFoundResults.size()>=this->maxSize){
     this->topFoundResults.pop();
   }
@@ -227,8 +276,11 @@ void TopKResults::add(std::pair<std::string, double> result){
 std::vector<std::pair<std::string, double>> TopKResults::to_vector(){
 
   std::vector<std::pair<std::string, double>> data;
-  for (auto i=0u; i<this->topFoundResults.size();i++){
-    data.push_back(this->topFoundResults.top());
+
+  auto max_size = this->topFoundResults.size();
+  for (auto i=0u; i<max_size;i++){
+    auto r =this->topFoundResults.top();
+    data.push_back(std::pair<std::string, double>(r.second, r.first));
     this->topFoundResults.pop();
   }
 
@@ -291,7 +343,7 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
         std::cerr << "Worker #" << i << " TMs to test :"  <<  len <<  "..." << std::endl;
         
         auto o = TreeSearch(len, seedPerTheard[i], i);
-        std::cerr << "Worker #" << i << " finished" << std::endl;
+        std::cerr << "Worker #" << i << " finished | vector size: " << o.size() << std::endl;
         return o;
     }));
     
@@ -303,32 +355,37 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
     auto r = f.get();
     total.insert(end(total), begin(std::move(r)), end(std::move(r)));
   }
-
+  //std::cerr << "| vector size: " << total.size() << std::endl;
   
-
   std::unordered_map<std::string, double> unordered_map;
+
     for(auto &pair:total){
+        //std::cerr << i++<<" rules: " << pair.first << " " << pair.second << std::endl;
         unordered_map.insert (pair);
     }
-    
+  
+  //std::cerr << "| unordered_map size: " << unordered_map.size() << std::endl;
+
   return unordered_map;
 }
 
 std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_length, unsigned int randSeed, unsigned int threadId){
 
   const unsigned int MAX_PATIENCE = 40u;
+  const unsigned int ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK = 100u;
   unsigned int current_patience = 0u;
 
   AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
   //std::unordered_set<std::string> visitedNodes;
   std::priority_queue<RuleMatrixNode> nodesToOpen;
-  TopKResults topKresult(10);
+  TopKResults topKresult(20u);
   //std::unordered_set<std::string> DEBUG_VECTOR;
 
   std::vector<TuringRecord> possibleRules = get_possible_rules(args.states,args.alphabet_size);
   unsigned int counter=0u;
   // Add the starting rule to the nodes to open
   double loss;
+  std::pair<double, double > loss_pair;
   const double RAND_MAX_MACHINES=10u;
   //const double RAND_MAX_MACHINES=1u;
 
@@ -340,12 +397,18 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
 
     StateMatrix st(args.states, args.alphabet_size);
     st.set_random(rng);
-    RuleMatrixNode startNode(st.get_state_matrix_string(), test_machine(st,all_models));
-    
+    RuleMatrixNode startNode(st.get_state_matrix_string(), test_machine(st, all_models, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK));
+
+    while (visitedNodes.contains(startNode.identifier)){
+      st.set_random(rng);
+      startNode = RuleMatrixNode(st.get_state_matrix_string(), test_machine(st,all_models, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK));
+    }
+
     nodesToOpen.push(startNode);
-    visitedNodes.safe_insert(startNode.identifier);
-    //std::cerr << "loss =>" << loss<< " Worker: " << threadId << " new? " << startNode.identifier <<"                   |" << std::endl;
+    //visitedNodes.safe_insert(startNode.identifier);
+    //std::cerr << "loss =>" << startNode.cost<< " Worker: " << threadId << " new? " << startNode.identifier <<"                   |" << std::endl;
   }
+  //exit(-9);
   unsigned int numberPossibleSucessors = ((args.states*args.alphabet_size*3)-1)*(args.states*args.alphabet_size);
   unsigned int minNumberSucessors = 1000;// get from args
   double last_loss = 9999999.9;
@@ -356,8 +419,13 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
   while((!nodesToOpen.empty()) && (i<traversal_length) && (found_program==false)) { // || 
     auto currentNode = nodesToOpen.top();
     nodesToOpen.pop();
-    visitedNodes.safe_insert(currentNode.identifier);
-    topKresult.add(std::pair<std::string, double>(currentNode.identifier, currentNode.cost));
+
+    if (!visitedNodes.safe_insert(currentNode.identifier)){
+      continue;
+    }
+
+    topKresult.add(std::pair<double, std::string>(currentNode.cost, currentNode.identifier));
+    //std::cerr<< "Hip: topResults size "<< topKresult.topFoundResults.size() << std::endl;
     
     if (last_loss==currentNode.cost && currentNode.cost>args.threshold){
       if (current_patience++>MAX_PATIENCE){
@@ -366,11 +434,11 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
         for (auto i=0u;i<RAND_MAX_MACHINES;i++){
           StateMatrix st(args.states, args.alphabet_size);
           st.set_random(rng);
-          RuleMatrixNode newGenNode(st.get_state_matrix_string(), test_machine(st,all_models));
+          RuleMatrixNode newGenNode(st.get_state_matrix_string(), test_machine(st,all_models, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK));
 
-          while (!visitedNodes.safe_insert(newGenNode.identifier)){
+          while (visitedNodes.contains(newGenNode.identifier)){
             st.set_random(rng);
-            newGenNode = RuleMatrixNode(st.get_state_matrix_string(), test_machine(st,all_models));
+            newGenNode = RuleMatrixNode(st.get_state_matrix_string(), test_machine(st,all_models, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK));
           }
           nodesToOpen.push(newGenNode);
         }
@@ -396,9 +464,11 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
 
     for(auto&sucessor: sucessors){ 
       if (found_program) break;
-      if(!visitedNodes.contains(sucessor.get_state_matrix_string()) ){
+      if( !visitedNodes.contains(sucessor.get_state_matrix_string()) ){
         
-        loss = test_machine(sucessor,all_models);
+        loss_pair = test_machine(sucessor,all_models, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK, currentNode);
+        loss = loss_pair.first;
+
         if(loss<args.threshold) {
           
           if(loss==0){
@@ -408,7 +478,7 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
             found_program=true;
             // converting a priority_queue to a vector to keep the same API
             // It would be more efficient to define iterators in the API
-            
+            std::cerr<< "At exit time: "<< topKresult.topFoundResults.size() << std::endl;
             return topKresult.to_vector();
           }
         }
@@ -417,12 +487,13 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
           //std::cerr<< "St. String :"<< currentNode.identifier <<"; Cost : " <<currentNode.cost<< " Worker: "<< threadId <<std::endl;
           std::cerr<<"Cost : " <<currentNode.cost<< " T machines " << i << " Worker: "<< threadId <<std::endl;
         }
-        RuleMatrixNode newNode(sucessor.get_state_matrix_string(), loss);
+        RuleMatrixNode newNode(sucessor.get_state_matrix_string(), loss_pair);
         nodesToOpen.push(newNode);
-      }
+      } 
     }
   }
   std::cerr<<"counter: "<<counter<<std::endl;
+  std::cerr<< "At exit time: "<< topKresult.topFoundResults.size() << std::endl;
   return topKresult.to_vector();
 }
 
