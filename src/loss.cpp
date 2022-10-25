@@ -45,12 +45,13 @@ double Loss::compute_loss(std::vector<MarkovTable> &mkv_table_vector){
     else{
         auto conditional_divergence_vector = kl.compute_divergency_pconditional(mkv_table_vector);
         auto seq_string_divergence_vector = kl.compute_divergency_p_k_elem(mkv_table_vector);
+
         seq_string_divergence = average_divergence_vector(seq_string_divergence_vector);
         conditional_divergence = average_divergence_vector(conditional_divergence_vector);
         // add penalty when lenght of the tapes differ
 
-
-        return (conditional_divergence*w)+(seq_string_divergence*(1-w)) + 0.01*length_penalizer(mkv_table_vector[0]);
+        //std::cerr << conditional_divergence*0.5 << " seq: " << seq_string_divergence*0.5 << " lenP: " << 0.01*length_penalizer(mkv_table_vector[0]) << std::endl;
+        return (conditional_divergence*w)+(seq_string_divergence*(1-w)) + 1*length_penalizer(mkv_table_vector[0]);
     }
 }
 

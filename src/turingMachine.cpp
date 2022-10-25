@@ -618,9 +618,9 @@ std::string Tape::print_written_tape(bool print_to_console) const{
   std::string written_tape= "";
   for (auto j = this->tape.begin() + this->ind_left + 1; j != this->tape.begin() + this->ind_right; ++j){    
       if(print_to_console){
-        std::cerr << bold_on << cyan_on <<*j << ' ' << bold_off;
+        std::cerr << bold_on << cyan_on <<*j  << bold_off;
         }
-      written_tape += std::to_string(*j) + " ";
+      written_tape += std::to_string(*j) + "";
   }
   if(print_to_console){
     std::cerr << std::endl;

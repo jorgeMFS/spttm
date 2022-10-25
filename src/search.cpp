@@ -125,7 +125,7 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
     std::vector<MarkovTable> mkv_vector=all_models.get_markov_tables();
     double short_loss = loss.compute_loss(mkv_vector);
 
-    // 
+    
     for (auto i = tapes_iter_short; i < args.tape_iterations ; ++i){
         TapeMoves tpMove = tm.act(); 
         all_models.update_tables(tpMove, tm.turingTape);
@@ -133,6 +133,20 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
 
     mkv_vector=all_models.get_markov_tables();
     return std::pair<double, double> (loss.compute_loss(mkv_vector), short_loss);
+    /*
+   TuringMachine tm(st);
+    all_models.reset();
+
+    for (auto i = 0u; i < args.tape_iterations ; ++i){
+        TapeMoves tpMove = tm.act(); 
+        all_models.update_tables(tpMove, tm.turingTape);
+    }
+
+    auto mkv_vector=all_models.get_markov_tables();
+    auto main_loss = loss.compute_loss(mkv_vector);
+    auto short_loss = main_loss;
+    return std::pair<double, double> (main_loss, short_loss);
+    */
 }
 
 std::vector<std::pair<std::string, double>> Search::MonteCarloSearch(TmId traversal_length){
@@ -372,7 +386,7 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
 std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_length, unsigned int randSeed, unsigned int threadId){
 
   const unsigned int MAX_PATIENCE = 40u;
-  const unsigned int ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK = 100u;
+  const unsigned int ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK = std::min(args.alphabet_size*args.states, 50u);
   unsigned int current_patience = 0u;
 
   AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);

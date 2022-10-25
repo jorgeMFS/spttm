@@ -11,6 +11,8 @@ void KullbackLeiblerDivergency::init(){
     ReadInput readtarget(args.target_file);
     //readtarget.printData();
     auto target_vector = readtarget.get_input_vector_as_unsigned_int();
+
+    std::cerr << std::endl;
     bool print_bool = false;
     mk_target_vector = target.get_models(args, target_vector , print_bool);
     target_lenght = mk_target_vector[0].sum_all_elem();
