@@ -431,7 +431,7 @@ std::vector<StateMatrix> generate_sucessors(StateMatrix &st, std::vector<TuringR
   return successors;
 }
 
-std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules, double loss_value){
+std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules, double loss_value, std::minstd_rand rnd_gen){
   auto successors = generate_sucessors(st, possible_rules);
 
   unsigned int st_size=st.get_state_matrix_size();
@@ -447,11 +447,34 @@ std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<
   std::vector<StateMatrix> output_random_sucessors;
   
   // this injures the reproducibility
-  std::sample(successors.begin(), successors.end(), std::back_inserter(output_random_sucessors), number_outputs, std::mt19937{std::random_device{}()});
+  std::sample(successors.begin(), successors.end(), std::back_inserter(output_random_sucessors), number_outputs, rnd_gen);
 
   return output_random_sucessors;
 }
 
+std::vector<StateMatrix> generate_random_sucessors_w_mutations(StateMatrix &st, std::vector<TuringRecord> &possible_rules, double loss_value, std::minstd_rand rnd_gen){
+
+  auto successors = generate_random_sucessors(st, possible_rules, loss_value, rnd_gen);
+
+  std::random_device rd;  // Will be used to obtain a seed for the random number engine
+  std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
+  std::uniform_real_distribution<> real_dis(0.0, 1.0);
+  std::uniform_int_distribution<> int_dis(0, possible_rules.size()-1);
+
+  for (auto &successor: successors){
+    
+//    if (loss_to_probability(loss_value)>real_dis(gen)){
+      // mutate
+      for (auto i=0u;i<successor.v.size();i++){
+        if (loss_to_probability(loss_value)>real_dis(gen)){ 
+          successor.set_rule(i, possible_rules[int_dis(gen)]);
+        }
+      }
+  //  }
+  }
+
+  return successors;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

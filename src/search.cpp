@@ -409,8 +409,6 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
     //std::cerr << "loss =>" << startNode.cost<< " Worker: " << threadId << " new? " << startNode.identifier <<"                   |" << std::endl;
   }
   //exit(-9);
-  unsigned int numberPossibleSucessors = ((args.states*args.alphabet_size*3)-1)*(args.states*args.alphabet_size);
-  unsigned int minNumberSucessors = 1000;// get from args
   double last_loss = 9999999.9;
  // std::uniform_int_distribution<int>  distr(range_from, range_to);
   std::vector<StateMatrix> sucessors;
@@ -456,11 +454,10 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
 
     StateMatrix st(currentNode.identifier, args.states, args.alphabet_size);
     
-    if (numberPossibleSucessors<minNumberSucessors){
-      sucessors = generate_sucessors(st,possibleRules);
-    }else{
-      sucessors = generate_random_sucessors(st,possibleRules, currentNode.cost);
-    }
+
+    //sucessors = generate_random_sucessors_w_mutations(st,possibleRules, currentNode.cost);
+    sucessors = generate_random_sucessors(st,possibleRules, currentNode.cost, rng);
+    
     //std::cerr<< "How many? "<< sucessors.size()<< " loss " <<currentNode.cost <<std::endl;
 
     for(auto&sucessor: sucessors){ 

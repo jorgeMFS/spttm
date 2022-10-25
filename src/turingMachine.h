@@ -108,7 +108,9 @@ struct StateMatrix{
 
 StateMatrix determine_last_state_Matrix(const unsigned int& number_of_states, const unsigned int& alphabet_size);
 std::vector<StateMatrix> generate_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules);
-std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules, double loss_value);
+std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules, double loss_value, std::minstd_rand rnd_gen);
+std::vector<StateMatrix> generate_random_sucessors_w_mutations(StateMatrix &st, std::vector<TuringRecord> &possible_rules, double loss_value, std::minstd_rand rnd_gen);
+
 struct compare_st{
     bool operator()(const StateMatrix & st1, const StateMatrix  & st2);
 };
