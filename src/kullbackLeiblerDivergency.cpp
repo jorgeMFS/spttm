@@ -2,6 +2,7 @@
 #include "parseArgs.h"
 #include "read_input.h"
 #include "interactiveMarkovModel.h"
+#include "util.h"
 
 KullbackLeiblerDivergency::KullbackLeiblerDivergency(Args args):target(args.target_file, args.alphabet_size),args(args){
     init();
@@ -47,38 +48,45 @@ void KullbackLeiblerDivergency::run_w_input_file(){
 }
 
 
-std::vector<double> KullbackLeiblerDivergency::compute_divergency_pconditional(std::vector<MarkovTable> &mk_input_vector) const{
+std::vector<double> KullbackLeiblerDivergency::compute_divergency_pconditional(std::vector<MarkovTable> &mk_input_vector, double (*f)(unsigned int)) const{
     std::vector<double> relative_entropy;
 
     for(auto i_in = 0u; i_in<mk_input_vector.size(); ++i_in ){
         
             auto mk_input=mk_input_vector[i_in];
             auto mk_target=mk_target_vector[i_in];
-            relative_entropy.push_back(compute_divergency_pconditional(mk_input,mk_target));
+            relative_entropy.push_back(compute_divergency_pconditional(mk_input,mk_target, f));
         }
     return relative_entropy;
 }
 
-
+std::vector<double> KullbackLeiblerDivergency::compute_divergency_pconditional(std::vector<MarkovTable> &mk_input_vector) const{
+    return compute_divergency_pconditional(mk_input_vector, [](unsigned int x){ return static_cast<double>(x);});
+}
 
 std::vector<double> KullbackLeiblerDivergency::compute_divergency_p_k_elem(std::vector<MarkovTable> &mk_input_vector) const{
+    return compute_divergency_p_k_elem(mk_input_vector, [](unsigned int x){ return static_cast<double>(x);});
+}
+
+std::vector<double> KullbackLeiblerDivergency::compute_divergency_p_k_elem(std::vector<MarkovTable> &mk_input_vector, double (*f)(unsigned int)) const{
     std::vector<double> relative_entropy;
 
     for(auto i_in = 0u; i_in<mk_input_vector.size(); ++i_in ){
         
         auto mk_input=mk_input_vector[i_in];
         auto mk_target=mk_target_vector[i_in];
-        relative_entropy.push_back(compute_divergency_p_k_elem(mk_input,mk_target));
+        relative_entropy.push_back(compute_divergency_p_k_elem(mk_input,mk_target, f));
     }
     return relative_entropy;
 }
-double KullbackLeiblerDivergency::compute_divergency_pconditional(MarkovTable &mk_input, MarkovTable &mk_target) const{
+
+double KullbackLeiblerDivergency::compute_divergency_pconditional(MarkovTable &mk_input, MarkovTable &mk_target, double (*f)(unsigned int)) const{
     unsigned int c_size= pow(mk_input.alphSz,mk_input.get_context());
     //std::cout << c_size << std::endl;
     unsigned int alphabet_size= mk_input.alphSz;
 
-    mk_input.normalize(args.lambda);
-    mk_target.normalize(args.lambda);
+    mk_input.normalize(args.lambda, f);
+    mk_target.normalize(args.lambda, f);
 
     double sum_probability= 0;
     for (auto i=0u; i<c_size;++i){
@@ -94,18 +102,29 @@ double KullbackLeiblerDivergency::compute_divergency_pconditional(MarkovTable &m
     return sum_probability/c_size;
 }
 
+double KullbackLeiblerDivergency::compute_divergency_pconditional(MarkovTable &mk_input, MarkovTable &mk_target) const{
+    return compute_divergency_pconditional(mk_input, mk_target, [](unsigned int x){ return static_cast<double>(x);});
+}
+
 double KullbackLeiblerDivergency::compute_divergency_p_k_elem(MarkovTable &mk_input, MarkovTable &mk_target) const{
+    return compute_divergency_p_k_elem(mk_input, mk_target, [](unsigned int x){ return static_cast<double>(x);});
+}
+
+double KullbackLeiblerDivergency::compute_divergency_p_k_elem(MarkovTable &mk_input, MarkovTable &mk_target, double (*f)(unsigned int)) const{
     unsigned int c_size= pow(mk_input.alphSz,mk_input.get_context());
     unsigned int alphabet_size= mk_input.alphSz;
 
     double sum_probability= 0;
-    auto sum_all_elem_target = mk_target.sum_all_elem();
-    auto sum_all_elem_input = mk_input.sum_all_elem();
+    auto sum_all_elem_target = mk_target.sum_all_elem(f);
+    auto sum_all_elem_input = mk_input.sum_all_elem(f);
 
     for (auto i=0u; i<c_size;++i){
         for (auto j=0u; j<alphabet_size;++j){
-            auto p_target=(mk_target.get_value(i,j)+args.lambda)/(sum_all_elem_target + mk_target.get_vector().size()*args.lambda);
-            auto p_input= (mk_input.get_value(i,j)+args.lambda)/(sum_all_elem_input + mk_input.get_vector().size()*args.lambda);
+            auto target_value = f(mk_target.get_value(i,j));
+            auto input_value = f(mk_input.get_value(i,j));
+
+            auto p_target=(target_value+args.lambda)/(sum_all_elem_target + mk_target.get_vector().size()*args.lambda);
+            auto p_input= (input_value+args.lambda)/(sum_all_elem_input + mk_input.get_vector().size()*args.lambda);
             sum_probability+= p_target * log2( p_target/p_input);
         }
     }

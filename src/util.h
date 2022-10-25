@@ -75,8 +75,6 @@ void power(int x, int n);
 //Compute_average_of_vector
 
 
-
-
 /**  Returns TmId of the total number of Turing machines for a number of states and alphabet size.
  * @param states the state cardinality
  * @param alphabet_size the alphabet's size

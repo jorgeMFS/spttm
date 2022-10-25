@@ -32,26 +32,32 @@ double Loss::compute_loss(std::vector<MarkovTable> &mkv_table_vector){
     double conditional_divergence=0;
     double seq_string_divergence=0;
     
+    auto length_pen = 0.01 * length_penalizer(mkv_table_vector[0]);
+    //length_pen = 0.01 * length_pen*log2(length_pen);
+    auto NORMALIZER_TRANSFORMATION = [](unsigned int x){return static_cast<double>(x);};
+    //auto NORMALIZER_TRANSFORMATION = [](unsigned int x){return pow(x, 2);};
+    //auto NORMALIZER_TRANSFORMATION = [](unsigned int x){return x*log2(x+1);};
     if(w==1){
-        auto conditional_divergence_vector = kl.compute_divergency_pconditional(mkv_table_vector);
+        auto conditional_divergence_vector = kl.compute_divergency_pconditional(mkv_table_vector, NORMALIZER_TRANSFORMATION);
         conditional_divergence = average_divergence_vector(conditional_divergence_vector);
-        return conditional_divergence;
+        return conditional_divergence + length_pen;
     }
     else if(w==0){
-        auto seq_string_divergence_vector = kl.compute_divergency_p_k_elem(mkv_table_vector);
+        auto seq_string_divergence_vector = kl.compute_divergency_p_k_elem(mkv_table_vector, NORMALIZER_TRANSFORMATION);
         seq_string_divergence = average_divergence_vector(seq_string_divergence_vector);
-        return seq_string_divergence;
+        return seq_string_divergence + length_pen;
     }
     else{
-        auto conditional_divergence_vector = kl.compute_divergency_pconditional(mkv_table_vector);
-        auto seq_string_divergence_vector = kl.compute_divergency_p_k_elem(mkv_table_vector);
+        auto conditional_divergence_vector = kl.compute_divergency_pconditional(mkv_table_vector, NORMALIZER_TRANSFORMATION);
+        auto seq_string_divergence_vector = kl.compute_divergency_p_k_elem(mkv_table_vector, NORMALIZER_TRANSFORMATION);
 
         seq_string_divergence = average_divergence_vector(seq_string_divergence_vector);
         conditional_divergence = average_divergence_vector(conditional_divergence_vector);
         // add penalty when lenght of the tapes differ
 
         //std::cerr << conditional_divergence*0.5 << " seq: " << seq_string_divergence*0.5 << " lenP: " << 0.01*length_penalizer(mkv_table_vector[0]) << std::endl;
-        return (conditional_divergence*w)+(seq_string_divergence*(1-w)) + 1*length_penalizer(mkv_table_vector[0]);
+        // fix the manual 0.1
+        return (conditional_divergence*w)+(seq_string_divergence*(1-w)) + length_pen;
     }
 }
 

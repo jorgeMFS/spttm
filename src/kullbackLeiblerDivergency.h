@@ -24,7 +24,9 @@ struct KullbackLeiblerDivergency{
         unsigned int target_lenght;
         void run_w_input_file();
         std::vector<double> compute_divergency_pconditional(std::vector<MarkovTable> &mk_input_vector) const;
+        std::vector<double> compute_divergency_pconditional(std::vector<MarkovTable> &mk_input_vector, double (*f)(unsigned int)) const;
         std::vector<double> compute_divergency_p_k_elem(std::vector<MarkovTable> &mk_input_vector) const;
+        std::vector<double> compute_divergency_p_k_elem(std::vector<MarkovTable> &mk_input_vector, double (*f)(unsigned int)) const;
 
     private:
         StringProcess target;
@@ -33,6 +35,8 @@ struct KullbackLeiblerDivergency{
         
         void init();
         double compute_divergency_pconditional(MarkovTable &mk_input, MarkovTable &mk_target) const;
+        double compute_divergency_pconditional(MarkovTable &mk_input, MarkovTable &mk_target, double (*f)(unsigned int)) const;
         double compute_divergency_p_k_elem(MarkovTable &mk_input, MarkovTable &mk_target) const;
+        double compute_divergency_p_k_elem(MarkovTable &mk_input, MarkovTable &mk_target, double (*f)(unsigned int)) const;
 };
 

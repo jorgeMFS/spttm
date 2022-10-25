@@ -42,9 +42,13 @@ struct MarkovTable{
    */
   MarkovTable(unsigned int k, unsigned int alphabet_size, double alpha);
   
+  void normalize(double lambda, double (*f)(unsigned int));
   void normalize(double lambda);
 
+  void quadratic_normalize(double lambda);
+  
   unsigned int sum_all_elem() const;
+  unsigned int sum_all_elem(double (*f)(unsigned int)) const;
   
   std::vector<double> get_normalized_vector() const;
   /**

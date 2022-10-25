@@ -19,7 +19,7 @@ int main (int argc, char **argv){
     Args argument = parseArgs(argc,argv);
     //printArgs(argument);
     double weight = 0.5;
-    Search search(argument,weight);
+    Search search(argument, weight);
     
     search.init();
 }

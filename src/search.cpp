@@ -386,10 +386,11 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
 std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_length, unsigned int randSeed, unsigned int threadId){
 
   const unsigned int MAX_PATIENCE = 40u;
-  const unsigned int ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK = std::min(args.alphabet_size*args.states, 50u);
+  const unsigned int ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK = std::min(args.alphabet_size*args.states, 50lu);
   unsigned int current_patience = 0u;
 
   AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
+
   //std::unordered_set<std::string> visitedNodes;
   std::priority_queue<RuleMatrixNode> nodesToOpen;
   TopKResults topKresult(20u);

@@ -20,6 +20,27 @@ MarkovTable::MarkovTable(unsigned int k, unsigned int alphabet_size, double alph
 unsigned int MarkovTable::get_context() const{
     return this->k;
 }
+
+void MarkovTable::normalize(double lambda, double (*f)(unsigned int)) {
+    normalized_fcm.clear();
+    // for each line, normalize by max value + alpha;
+    unsigned int counter = 0;
+    std::vector<double> line;
+    double denominator=0.0;
+    for(auto&& x: this->markovVector){    
+        line.push_back(f(x)+lambda);
+        denominator+=(f(x)+lambda);
+
+        if(++counter == this->alphSz){
+            counter=0;
+            std::transform(line.begin(), line.end(), line.begin(), [denominator](double &c){ return c/denominator; });
+            normalized_fcm.insert(normalized_fcm.end(), line.begin(), line.end());
+            denominator=0;
+            line.clear();
+        }
+    }
+};
+
 void MarkovTable::normalize(double lambda) {
     normalized_fcm.clear();
     // for each line, normalize by max value + alpha;
@@ -35,6 +56,29 @@ void MarkovTable::normalize(double lambda) {
             std::transform(line.begin(), line.end(), line.begin(), [denominator](double &c){ return c/denominator; });
             normalized_fcm.insert(normalized_fcm.end(), line.begin(), line.end());
             denominator=0;
+            line.clear();
+        }
+    }
+};
+
+void MarkovTable::quadratic_normalize(double lambda){
+    
+    normalized_fcm.clear();
+    
+    // for each line, normalize by max value + alpha;
+    unsigned int counter = 0;
+    std::vector<double> line;
+    double denominator=0.0;
+
+    for(auto&& x: this->markovVector){    
+        line.push_back(x*x+lambda);
+        denominator+=(x*x+lambda);
+
+        if(++counter == this->alphSz){
+            counter=0;
+            std::transform(line.begin(), line.end(), line.begin(), [denominator](double &c){ return c/denominator; });
+            normalized_fcm.insert(normalized_fcm.end(), line.begin(), line.end());
+            denominator=0.0;
             line.clear();
         }
     }
@@ -216,7 +260,16 @@ unsigned int MarkovTable::sum_all_elem() const{
      for (auto& n : markovVector)
         sum_of_elems += n;
     return sum_of_elems;
+}
+
+unsigned int MarkovTable::sum_all_elem(double (*f)(unsigned int)) const{
+     auto sum_of_elems=0u;
+     for (auto& n : markovVector)
+        sum_of_elems += f(n);
+    return sum_of_elems;
 }   
+
+
 void MarkovTable::print() const{
     unsigned int counter = 0;
     std::cout << std::endl;
