@@ -10,7 +10,7 @@ from pprint import pprint
 from collections import Counter
 import itertools
 import time
-from config import SEED,TAPE_ITERATIONS,FILE_PREFIX,NUMBER_GEN_FILES,NUMBER_TMS_TEST_FILE_CREATION,ALPHA
+from config import SEED_C,TAPE_ITERATIONS,FILE_PREFIX,NUMBER_GEN_FILES,NUMBER_TMS_TEST_FILE_CREATION,ALPHA
 
 #Paths
 working_dir="../"
@@ -19,9 +19,9 @@ working_dir="../"
 def _initialize():
     os.chdir(working_dir)
     
-    for alphabet in range(2,5):
-        for state in range(2,31):
-            os.system(f'./tprl   -e {SEED} -s {state} -a {alphabet} -A {ALPHA} -i {TAPE_ITERATIONS} -k 2:5 -f {FILE_PREFIX}  -N {NUMBER_GEN_FILES} -n {NUMBER_TMS_TEST_FILE_CREATION}') 
+    for alphabet in range(2,5,2):
+        for state in [ 2**x for x in range(1,7)]:
+            os.system(f'./tprl   -e {SEED_C} -s {state} -a {alphabet} -A {ALPHA} -i {TAPE_ITERATIONS} -k 2 -f {FILE_PREFIX}  -N {NUMBER_GEN_FILES} -n {NUMBER_TMS_TEST_FILE_CREATION}') 
 
 def main():
     _initialize()

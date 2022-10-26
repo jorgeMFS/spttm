@@ -16,16 +16,16 @@ from config import TAPE_ITERATIONS,K_INIT,K_LAST,ALPHA,LAMBDA,THRESHOLD,THREADS,
 working_dir="../"
 
 #Variable
-SEARCH_MODE=["S","M"]
+SEARCH_MODE=["M"]
 
 def _initialize():
     os.chdir(working_dir)
     current_directory = os.getcwd()
     print("Current working directory:", current_directory)
     
-    for alphabet in range(2,5):
-        for state in range(2,31):
-            for nc in range(0,10):
+    for alphabet in range(2,5,2):
+        for state in [ 2**x for x in range(1,7)]:
+            for nc in range(0,10,2):
                 path = "tapeTestPool/"+str(alphabet)+"/"+str(state)+"/"+str(nc)+"/"; 
                 if os.path.exists(path):
                     for filename in os.listdir(path):
