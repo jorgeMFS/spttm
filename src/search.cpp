@@ -47,7 +47,7 @@ void Search::init(){
 std::vector<std::pair<std::string, double>> Search::SequentialSearch(TmId traversal_length, TmId traversal_offset){
 
     //stored data;
-    std::vector<std::pair<std::string, double>> tm_data;
+    TopKResults topKresult(20u);
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
     
     StateMatrix st(args.states,args.alphabet_size);
@@ -58,19 +58,21 @@ std::vector<std::pair<std::string, double>> Search::SequentialSearch(TmId traver
 
     do {
         double loss = test_machine(st,all_models);
-        if(loss<args.threshold) {
-            tm_data.push_back(std::pair<std::string, double>(st.get_state_matrix_string(), loss));
-            if(loss==0){
-                std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
-                std::cerr<< st.get_state_matrix_string()<<std::endl;
-                found_program=true;
-                return tm_data;
-            }
-        } 
+        
+        topKresult.add(std::pair<double, std::string>(loss, st.get_state_matrix_string()));
+
+        if(loss==0){
+            std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
+            std::cerr<< st.get_state_matrix_string()<<std::endl;
+            found_program=true;
+            return topKresult.to_vector();
+        }
+        
         st.next();
         counter += 1;
     } while ((counter < traversal_length) && (found_program==false));
-    return tm_data;
+
+    return topKresult.to_vector();
 }
 
 double Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models) {
@@ -88,7 +90,7 @@ double Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<Interacti
 }
 
 std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short, RuleMatrixNode father_node) {
-    
+  
     TuringMachine tm(st);
     all_models.reset();
     for (auto i = 0u; i < tapes_iter_short ; ++i){
@@ -111,6 +113,20 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
 
     mkv_vector=all_models.get_markov_tables();
     return std::pair<double, double> (loss.compute_loss(mkv_vector), son_short_loss);
+    /*
+   TuringMachine tm(st);
+    all_models.reset();
+
+    for (auto i = 0u; i < args.tape_iterations ; ++i){
+        TapeMoves tpMove = tm.act(); 
+        all_models.update_tables(tpMove, tm.turingTape);
+    }
+
+    auto mkv_vector=all_models.get_markov_tables();
+    auto main_loss = loss.compute_loss(mkv_vector);
+    auto short_loss = main_loss;
+    return std::pair<double, double> (main_loss, short_loss);
+    */
 }
 
 std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short) {
@@ -149,27 +165,19 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
     */
 }
 
-std::vector<std::pair<std::string, double>> Search::MonteCarloSearch(TmId traversal_length){
-    std::vector<std::pair<std::string, double>> tm_data;
+std::vector<std::pair<std::string, double>> Search::MonteCarloSearch(TmId traversal_length, unsigned int randSeed){
     StateMatrix st(args.states,args.alphabet_size);
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
+    TopKResults topKresult(20u);
 
     std::unordered_set<std::string> st_matrix;
     bool entry=false;
 
-    
-    std::minstd_rand rng{seed};
-    
-    if(seed==0){
-      auto rd_dev = std::random_device{};
-      std::seed_seq seq{rd_dev(), rd_dev(), rd_dev(), rd_dev()};
-      std::mt19937 rng(seq);
-    }
-
+    std::minstd_rand rng{randSeed};
 
     for (auto counter = 0ull; counter < traversal_length; counter++) {
         if(found_program){
-            return tm_data;
+            return topKresult.to_vector();
         }
 
         do{
@@ -181,17 +189,16 @@ std::vector<std::pair<std::string, double>> Search::MonteCarloSearch(TmId traver
         
         double loss = test_machine(st,all_models);
 
-        if(loss<args.threshold) {
-            tm_data.push_back(std::pair<std::string, double>(st.get_state_matrix_string(), loss));
-            if(loss==0){
-              std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
-              std::cerr<< st.get_state_matrix_string()<<std::endl;
-              found_program=true;
-              return tm_data;
-            }
-        } 
+        topKresult.add(std::pair<double, std::string>(loss, st.get_state_matrix_string()));
+        if(loss==0){
+          std::cerr<< bold_on  << green_on <<"Found Candidate, loss:" << bold_off <<bold_on << cyan_on<< loss << bold_off <<std::endl;
+          std::cerr<< st.get_state_matrix_string()<<std::endl;
+          found_program=true;
+          return topKresult.to_vector();
+        }
+        
     }
-    return tm_data;
+    return topKresult.to_vector();
 }
 
 std::unordered_map<std::string, double> Search::MonteCarloSearchMulticore() {
@@ -203,6 +210,14 @@ std::unordered_map<std::string, double> Search::MonteCarloSearchMulticore() {
   auto partition_len = traversal_len / args.jobs;
   auto partition_rest = traversal_len % args.jobs;
 
+  std::vector<unsigned int> seedPerTheard;
+  seedPerTheard.push_back((prime * seed) % 4079);
+
+  // 
+  for (auto i = 0u; i < args.jobs-1; ++i) {
+    seedPerTheard.push_back((prime * seedPerTheard[i]) % 4079);
+  }
+
   // spawn  tasks asynchronously
   std::vector<std::future<std::vector<std::pair<std::string, double>>>> works;
   for (auto i = 0u; i < args.jobs; ++i) {
@@ -213,9 +228,8 @@ std::unordered_map<std::string, double> Search::MonteCarloSearchMulticore() {
 
     works.push_back(std::async([=]() {
         std::cerr << "Worker #" << i << " TMs to test :"  <<  len <<  "..." << std::endl;
-        seed = (prime * seed) % 4079;
         //std::cerr << "seed =>" << seed<< std::endl;
-        auto o = MonteCarloSearch(len);
+        auto o = MonteCarloSearch(len, seedPerTheard[i]);
         std::cerr << "Worker #" << i << " finished" << std::endl;
         return o;
     }));

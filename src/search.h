@@ -68,7 +68,7 @@ struct Search{
         std::vector<std::pair<std::string, double>> TreeSearch( TmId traversal_length, unsigned int randSeed, unsigned int threadId);
 
         std::vector<std::pair<std::string, double>> SequentialSearch(TmId traversal_length, TmId traversal_offset);
-        std::vector<std::pair<std::string, double>> MonteCarloSearch(TmId traversal_length);
+        std::vector<std::pair<std::string, double>> MonteCarloSearch(TmId traversal_length, unsigned int randSeed);
         double test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models);
         std::pair<double, double> test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short, RuleMatrixNode father_node);
         std::pair<double, double> test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short);
