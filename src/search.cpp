@@ -169,6 +169,7 @@ std::vector<std::pair<std::string, double>> Search::MonteCarloSearch(TmId traver
     StateMatrix st(args.states,args.alphabet_size);
     AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(args.k, args.alphabet_size, args.alpha);
     TopKResults topKresult(20u);
+    std::cerr << "seed =>" << randSeed << std::endl;
 
     std::unordered_set<std::string> st_matrix;
     bool entry=false;
