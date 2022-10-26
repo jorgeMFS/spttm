@@ -7,6 +7,9 @@ RuleMatrixNode::RuleMatrixNode(const std::string &st_str, const double &cost, co
 
 RuleMatrixNode::RuleMatrixNode(const std::string &st_str, const std::pair<double, double> &costs):identifier(st_str), cost(costs.first), short_cost(costs.second){}
 
+RuleMatrixNode::RuleMatrixNode(const std::string &st_str, const double &cost, const double &short_cost, unsigned int current_iterations):identifier(st_str),cost(cost),short_cost(short_cost),current_iterations(current_iterations){}
+RuleMatrixNode::RuleMatrixNode(const std::string &st_str, const std::pair<double, double> &costs, unsigned int current_iterations):identifier(st_str), cost(costs.first), short_cost(costs.second),current_iterations(current_iterations){}
+
 bool RuleMatrixNode::operator==(const RuleMatrixNode &tr) const {
     return (identifier == tr.identifier);
 }

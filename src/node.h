@@ -13,10 +13,13 @@ struct RuleMatrixNode{
     std::string identifier;
     double cost;
     double short_cost;
+    unsigned int current_iterations;
 
     RuleMatrixNode(const std::string &st_str, const double &cost);
     RuleMatrixNode(const std::string &st_str, const double &cost, const double &short_cost);
     RuleMatrixNode(const std::string &st_str, const std::pair<double, double> &costs);
+    RuleMatrixNode(const std::string &st_str, const double &cost, const double &short_cost, unsigned int current_iterations);
+    RuleMatrixNode(const std::string &st_str, const std::pair<double, double> &costs, unsigned int current_iterations);
     bool operator==(const RuleMatrixNode& rmn) const;
     bool operator>=(const RuleMatrixNode& rmn) const;
     bool operator<=(const RuleMatrixNode& tr) const;

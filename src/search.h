@@ -72,6 +72,9 @@ struct Search{
         double test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models);
         std::pair<double, double> test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short, RuleMatrixNode father_node);
         std::pair<double, double> test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short);
+        std::pair<double, double> test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short, unsigned int max_iter, RuleMatrixNode father_node);
+        std::pair<double, double> test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short, unsigned int max_iter);
+        void add_random_nodes(std::priority_queue<RuleMatrixNode> &nodesToOpen, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, std::minstd_rand rnd_gen, unsigned int iterations_son);
 
         void write_to_file(std::unordered_map<std::string, double> results);
 

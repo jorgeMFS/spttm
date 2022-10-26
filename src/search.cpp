@@ -87,7 +87,7 @@ double Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<Interacti
     return loss.compute_loss(mkv_vector);
 }
 
-std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short, RuleMatrixNode father_node) {
+std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short, unsigned int max_iter, RuleMatrixNode father_node){
     
     TuringMachine tm(st);
     all_models.reset();
@@ -104,7 +104,7 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
     }
 
     // 
-    for (auto i = tapes_iter_short; i < args.tape_iterations ; ++i){
+    for (auto i = tapes_iter_short; i < max_iter ; ++i){
         TapeMoves tpMove = tm.act(); 
         all_models.update_tables(tpMove, tm.turingTape);
     }
@@ -113,8 +113,15 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
     return std::pair<double, double> (loss.compute_loss(mkv_vector), son_short_loss);
 }
 
+std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short, RuleMatrixNode father_node) {
+  return test_machine(st, all_models, tapes_iter_short, args.tape_iterations, father_node);
+}
+      std::pair<double, double> test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short, unsigned int max_iter);
+
+
+
 std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short) {
-    
+    /*
     TuringMachine tm(st);
     all_models.reset();
     for (auto i = 0u; i < tapes_iter_short ; ++i){
@@ -133,7 +140,7 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
 
     mkv_vector=all_models.get_markov_tables();
     return std::pair<double, double> (loss.compute_loss(mkv_vector), short_loss);
-    /*
+    */
    TuringMachine tm(st);
     all_models.reset();
 
@@ -146,7 +153,7 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
     auto main_loss = loss.compute_loss(mkv_vector);
     auto short_loss = main_loss;
     return std::pair<double, double> (main_loss, short_loss);
-    */
+    
 }
 
 std::vector<std::pair<std::string, double>> Search::MonteCarloSearch(TmId traversal_length){
@@ -383,6 +390,26 @@ std::unordered_map<std::string, double> Search::TreeSearchMulticore(){
   return unordered_map;
 }
 
+const double RAND_MAX_MACHINES=10u;
+
+void Search::add_random_nodes(std::priority_queue<RuleMatrixNode> &nodesToOpen, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, std::minstd_rand rnd_gen, unsigned int iterations_son){
+  for (auto i=0u;i<RAND_MAX_MACHINES;i++){
+
+    StateMatrix st(args.states, args.alphabet_size);
+    st.set_random(rnd_gen);
+    RuleMatrixNode startNode(st.get_state_matrix_string(), test_machine(st, all_models, iterations_son));
+
+    while (visitedNodes.contains(startNode.identifier)){
+      st.set_random(rnd_gen);
+      startNode = RuleMatrixNode(st.get_state_matrix_string(), test_machine(st, all_models, iterations_son));
+    }
+
+    nodesToOpen.push(startNode);
+    //visitedNodes.safe_insert(startNode.identifier);
+    //std::cerr << "loss =>" << startNode.cost<< " Worker: " << threadId << " new? " << startNode.identifier <<"                   |" << std::endl;
+  }
+}
+
 std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_length, unsigned int randSeed, unsigned int threadId){
 
   const unsigned int MAX_PATIENCE = 40u;
@@ -401,32 +428,18 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
   // Add the starting rule to the nodes to open
   double loss;
   std::pair<double, double > loss_pair;
-  const double RAND_MAX_MACHINES=10u;
+  
   //const double RAND_MAX_MACHINES=1u;
 
   // multiple samples for better initialization
   std::cerr << "seed =>" << randSeed<< " Worker: " << threadId << "                   |" << std::endl;
   std::minstd_rand rng{randSeed};
 
-  for (auto i=0u;i<RAND_MAX_MACHINES;i++){
-
-    StateMatrix st(args.states, args.alphabet_size);
-    st.set_random(rng);
-    RuleMatrixNode startNode(st.get_state_matrix_string(), test_machine(st, all_models, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK));
-
-    while (visitedNodes.contains(startNode.identifier)){
-      st.set_random(rng);
-      startNode = RuleMatrixNode(st.get_state_matrix_string(), test_machine(st,all_models, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK));
-    }
-
-    nodesToOpen.push(startNode);
-    //visitedNodes.safe_insert(startNode.identifier);
-    //std::cerr << "loss =>" << startNode.cost<< " Worker: " << threadId << " new? " << startNode.identifier <<"                   |" << std::endl;
-  }
+  add_random_nodes(nodesToOpen, all_models, rng, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK);
   //exit(-9);
   double last_loss = 9999999.9;
  // std::uniform_int_distribution<int>  distr(range_from, range_to);
-  std::vector<StateMatrix> sucessors;
+  std::vector<std::pair<StateMatrix, unsigned int>> sucessors;
   auto i=0u;
   std::cerr<<"search :"<<traversal_length<<std::endl;
   while((!nodesToOpen.empty()) && (i<traversal_length) && (found_program==false)) { // || 
@@ -444,18 +457,7 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
       if (current_patience++>compute_max_patience(currentNode.cost, MAX_PATIENCE)){
         nodesToOpen = std::priority_queue<RuleMatrixNode>();
         std::cerr << bold_on << red_on << "Run out of patience | worker: " << threadId << bold_off << std::endl;
-        for (auto i=0u;i<RAND_MAX_MACHINES;i++){
-          StateMatrix st(args.states, args.alphabet_size);
-          st.set_random(rng);
-          RuleMatrixNode newGenNode(st.get_state_matrix_string(), test_machine(st,all_models, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK));
-
-          while (visitedNodes.contains(newGenNode.identifier)){
-            st.set_random(rng);
-            newGenNode = RuleMatrixNode(st.get_state_matrix_string(), test_machine(st,all_models, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK));
-          }
-          nodesToOpen.push(newGenNode);
-        }
-
+        add_random_nodes(nodesToOpen, all_models, rng, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK);
         current_patience = 0u;
         continue;
       }
@@ -471,15 +473,18 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
     
 
     //sucessors = generate_random_sucessors_w_mutations(st,possibleRules, currentNode.cost);
-    sucessors = generate_random_sucessors(st,possibleRules, currentNode.cost, rng);
+    //sucessors = generate_random_sucessors(st,possibleRules, currentNode.cost, rng);
+    sucessors = generate_random_sucessors_w_iterations(st,possibleRules, currentNode.cost, rng, args.tape_iterations, 1);
     
     //std::cerr<< "How many? "<< sucessors.size()<< " loss " <<currentNode.cost <<std::endl;
 
-    for(auto&sucessor: sucessors){ 
+    for(auto&tuple: sucessors){ 
+      auto current_iterations = tuple.second;
+      auto sucessor = tuple.first;
       if (found_program) break;
       if( !visitedNodes.contains(sucessor.get_state_matrix_string()) ){
         
-        loss_pair = test_machine(sucessor,all_models, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK, currentNode);
+        loss_pair = test_machine(sucessor, all_models, ITERATIONS_FOR_PREMATURE_SON_FATHER_CHECK, currentNode);
         loss = loss_pair.first;
 
         if(loss<args.threshold) {

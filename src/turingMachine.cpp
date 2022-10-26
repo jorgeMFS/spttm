@@ -431,6 +431,35 @@ std::vector<StateMatrix> generate_sucessors(StateMatrix &st, std::vector<TuringR
   return successors;
 }
 
+std::vector<std::pair<StateMatrix, unsigned int>> generate_random_sucessors_w_iterations(StateMatrix &st, std::vector<TuringRecord> &possible_rules, double loss_value, std::minstd_rand rnd_gen, unsigned int max_iterations, unsigned int delta){
+  
+  std::vector<std::pair<StateMatrix, unsigned int>> successors_w_iterations;
+
+  unsigned int st_size=st.get_state_matrix_size();
+
+  for (auto &k: {max_iterations-delta, max_iterations, max_iterations+delta}){
+    for (auto &successor : generate_sucessors(st, possible_rules)) {
+      successors_w_iterations.push_back(std::pair<StateMatrix, unsigned int>(successor, k));
+    }
+  }
+  
+  // random sampling of the above vector 
+  auto nMac = (((st_size*3)-1)*st_size)*3;
+  auto nMin = log2(nMac+1)*100;
+
+  unsigned int number_outputs = static_cast<unsigned int>(2/loss_value + nMin);
+
+  number_outputs = std::min(nMac, number_outputs);
+  
+  std::vector<std::pair<StateMatrix, unsigned int>> output_random_sucessors;
+  
+  std::sample(successors_w_iterations.begin(), successors_w_iterations.end(), std::back_inserter(output_random_sucessors), number_outputs, rnd_gen);
+
+  return output_random_sucessors;
+
+
+}
+
 std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules, double loss_value, std::minstd_rand rnd_gen){
   auto successors = generate_sucessors(st, possible_rules);
 
@@ -446,7 +475,6 @@ std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<
   
   std::vector<StateMatrix> output_random_sucessors;
   
-  // this injures the reproducibility
   std::sample(successors.begin(), successors.end(), std::back_inserter(output_random_sucessors), number_outputs, rnd_gen);
 
   return output_random_sucessors;

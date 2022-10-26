@@ -110,6 +110,7 @@ StateMatrix determine_last_state_Matrix(const unsigned int& number_of_states, co
 std::vector<StateMatrix> generate_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules);
 std::vector<StateMatrix> generate_random_sucessors(StateMatrix &st, std::vector<TuringRecord> &possible_rules, double loss_value, std::minstd_rand rnd_gen);
 std::vector<StateMatrix> generate_random_sucessors_w_mutations(StateMatrix &st, std::vector<TuringRecord> &possible_rules, double loss_value, std::minstd_rand rnd_gen);
+std::vector<std::pair<StateMatrix, unsigned int>> generate_random_sucessors_w_iterations(StateMatrix &st, std::vector<TuringRecord> &possible_rules, double loss_value, std::minstd_rand rnd_gen, unsigned int max_iterations, unsigned int delta);
 
 struct compare_st{
     bool operator()(const StateMatrix & st1, const StateMatrix  & st2);
