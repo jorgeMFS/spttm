@@ -452,7 +452,7 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
  // std::uniform_int_distribution<int>  distr(range_from, range_to);
   std::vector<StateMatrix> sucessors;
   auto i=0u;
-  std::cerr<<"search :"<<traversal_length<<std::endl;
+  //std::cerr<<"search :"<<traversal_length<<std::endl;
   while((!nodesToOpen.empty()) && (i<traversal_length) && (found_program==false)) { // || 
     auto currentNode = nodesToOpen.top();
     nodesToOpen.pop();
@@ -467,7 +467,7 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
     if (last_loss>=currentNode.cost){
       if (current_patience++>compute_max_patience(currentNode.cost, MAX_PATIENCE)){
         nodesToOpen = std::priority_queue<RuleMatrixNode>();
-        std::cerr << bold_on << red_on << "Run out of patience | worker: " << threadId << bold_off << std::endl;
+        //std::cerr << bold_on << red_on << "Run out of patience | worker: " << threadId << bold_off << std::endl;
         for (auto i=0u;i<RAND_MAX_MACHINES;i++){
           StateMatrix st(args.states, args.alphabet_size);
           st.set_random(rng);
@@ -516,22 +516,22 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
             // converting a priority_queue to a vector to keep the same API
             // It would be more efficient to define iterators in the API
             topKresult.add(std::pair<double, std::string>(loss, sucessor.get_state_matrix_string()));
-            std::cerr<< "At exit time: "<< topKresult.topFoundResults.size() << std::endl;
+            //std::cerr<< "At exit time: "<< topKresult.topFoundResults.size() << std::endl;
             return topKresult.to_vector();
           }
         }
-
-        if((i++ % 100000)==0){//std::cerr<<"counter: "<<counter<< " i : "<< i << " Worker: "<< threadId<<std::endl;
+        i++;
+        //if((i++ % 100000)==0){//std::cerr<<"counter: "<<counter<< " i : "<< i << " Worker: "<< threadId<<std::endl;
           //std::cerr<< "St. String :"<< currentNode.identifier <<"; Cost : " <<currentNode.cost<< " Worker: "<< threadId <<std::endl;
-          std::cerr<<"Cost : " <<currentNode.cost<< " T machines " << i << " Worker: "<< threadId <<std::endl;
-        }
+        //  std::cerr<<"Cost : " <<currentNode.cost<< " T machines " << i << " Worker: "<< threadId <<std::endl;
+        //}
         RuleMatrixNode newNode(sucessor.get_state_matrix_string(), loss_pair);
         nodesToOpen.push(newNode);
       } 
     }
   }
-  std::cerr<<"counter: "<<counter<<std::endl;
-  std::cerr<< "At exit time: "<< topKresult.topFoundResults.size() << std::endl;
+  //std::cerr<<"counter: "<<counter<<std::endl;
+  //std::cerr<< "At exit time: "<< topKresult.topFoundResults.size() << std::endl;
   return topKresult.to_vector();
 }
 
