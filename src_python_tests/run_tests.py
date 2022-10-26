@@ -10,7 +10,7 @@ from pprint import pprint
 from collections import Counter
 import itertools
 import time
-from config import TAPE_ITERATIONS,K_INIT,K_LAST,ALPHA,LAMBDA,THRESHOLD,THREADS,MACHINES_TO_RUN
+from config import TAPE_ITERATIONS,K_INIT,K_LAST,ALPHA,LAMBDA,THRESHOLD,THREADS,MACHINES_TO_RUN,SEED
 
 #Paths
 working_dir="../"
@@ -31,7 +31,7 @@ def _initialize():
                     for filename in os.listdir(path):
                         f = os.path.join(path, filename)
                         for searchMode in SEARCH_MODE:
-                            os.system(f'./spark   -s {state} -a {alphabet} -A {ALPHA} -i {TAPE_ITERATIONS} -l {LAMBDA} -k {K_INIT}:{K_LAST} -T {THRESHOLD} -S {searchMode} -t {f} -j {THREADS} -n {MACHINES_TO_RUN}')
+                            os.system(f'./spark -e {SEED} -s {state} -a {alphabet} -A {ALPHA} -i {TAPE_ITERATIONS} -l {LAMBDA} -k {K_INIT}:{K_LAST} -T {THRESHOLD} -S {searchMode} -t {f} -j {THREADS} -n {MACHINES_TO_RUN}')
 def main():
     _initialize()
 
