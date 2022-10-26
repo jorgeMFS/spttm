@@ -16,7 +16,7 @@ from config import TAPE_ITERATIONS,K_INIT,K_LAST,ALPHA,LAMBDA,THRESHOLD,THREADS,
 working_dir="../"
 
 #Variable
-SEARCH_MODE=["M"]
+SEARCH_MODE=["T"]
 
 def _initialize():
     os.chdir(working_dir)

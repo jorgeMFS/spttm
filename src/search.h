@@ -60,6 +60,7 @@ struct Search{
         bool found_program=false;
         unsigned int file_counter=0;
         unsigned int prime = 65519;
+        bool change;
         
         std::unordered_map<std::string, double> SequentialSearchMulticore();
         std::unordered_map<std::string, double> MonteCarloSearchMulticore();

@@ -17,6 +17,7 @@ Search::Search(Args args, double weight): args(args),loss(args,weight),traversal
     if (args.traversal_len==0 || args.traversal_len> max_value){
         traversal_len=max_value;
     }
+    this->change = args.states>2;
     //init();
 }
 
@@ -90,7 +91,10 @@ double Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<Interacti
 }
 
 std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short, RuleMatrixNode father_node) {
-  
+
+    if (this->change){
+
+    
     TuringMachine tm(st);
     all_models.reset();
     for (auto i = 0u; i < tapes_iter_short ; ++i){
@@ -113,7 +117,8 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
 
     mkv_vector=all_models.get_markov_tables();
     return std::pair<double, double> (loss.compute_loss(mkv_vector), son_short_loss);
-    /*
+    }else{
+      
    TuringMachine tm(st);
     all_models.reset();
 
@@ -126,11 +131,13 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
     auto main_loss = loss.compute_loss(mkv_vector);
     auto short_loss = main_loss;
     return std::pair<double, double> (main_loss, short_loss);
-    */
+    }
 }
 
 std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMarkovModel<InteractiveMarkovModel> &all_models, unsigned int tapes_iter_short) {
-    
+    if (this->change){
+
+  
     TuringMachine tm(st);
     all_models.reset();
     for (auto i = 0u; i < tapes_iter_short ; ++i){
@@ -149,7 +156,8 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
 
     mkv_vector=all_models.get_markov_tables();
     return std::pair<double, double> (loss.compute_loss(mkv_vector), short_loss);
-    /*
+      }else{
+    
    TuringMachine tm(st);
     all_models.reset();
 
@@ -162,7 +170,8 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
     auto main_loss = loss.compute_loss(mkv_vector);
     auto short_loss = main_loss;
     return std::pair<double, double> (main_loss, short_loss);
-    */
+    
+      }
 }
 
 std::vector<std::pair<std::string, double>> Search::MonteCarloSearch(TmId traversal_length, unsigned int randSeed){
