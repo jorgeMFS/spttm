@@ -60,6 +60,7 @@ struct StringProcess{
     */
     double readinput(MarkovTable& markovTable, unsigned int index) const;
     std::vector<double> readinput(MarkovTable& markovTable) const;
+    std::vector<double> readinput_cd(MarkovTable& markovTable) const;
     std::vector<double> readinput_multimarkovmodel(std::vector<MarkovTable>& markovTableVector, unsigned int index) const;
     double get_average_nrc(std::vector<MarkovTable>& markovTableVector, unsigned int index) const;
     

@@ -17,6 +17,8 @@
 
 #include "turingMachine.h"
 #include "parseArgs.h"
+#include "interactiveMarkovModel.h"
+#include "stringProcess.h"
 
 
 std::tuple<std::string, unsigned int, unsigned int, unsigned int>read_state_matrix_to_print(std::string fileName){
@@ -58,18 +60,58 @@ std::tuple<std::string, unsigned int, unsigned int, unsigned int>read_state_matr
 int main (int argc, char **argv){
     Args argument = parseArgs(argc,argv);
 
+    
     auto input=read_state_matrix_to_print(argument.input_file);
     auto st_string = std::get<0>(input);
     auto n_states = std::get<1>(input);
     auto n_alphabet = std::get<2>(input);
     auto number_iterations = std::get<3>(input);
 
+    StringProcess strProcess(argument.target_file, n_alphabet);
+
     StateMatrix st(st_string, n_states, n_alphabet );
     TuringMachine tm(st);
     TapeMoves tpMove;
+
+    AllInteractiveMarkovModel<InteractiveMarkovModel> all_models(argument.k, n_alphabet, argument.alpha);
+    all_models.reset();
+
     for (auto i = 0u; i < number_iterations; ++i){
         tpMove = tm.act(); // grave esti antaŭe
+        all_models.update_tables(tpMove, tm.turingTape);
     }
     tm.print_written_tape(true);
-    return 1;
+
+    std::vector<MarkovTable> mkv_vector = all_models.get_markov_tables();
+
+    std::vector<double> bits_per_k;
+    double cy_x;
+    for (auto &markovtable : mkv_vector){
+
+        auto cy_x_values = strProcess.readinput_cd(markovtable);
+        auto cy = strProcess.normalizer;
+        cy_x = *std::min_element(cy_x_values.begin(), cy_x_values.end());
+        
+        bits_per_k.push_back(std::min(cy_x, cy));
+
+        //std::cerr <<std::endl;
+        //for (auto &bits: bits_per_k){
+        //    std::cerr <<"bits " << bits <<" cy "<< cy << " cy_x " << cy_x << std::endl;
+       // }
+    }
+    auto min_bits_per_k_cy_x = std::ceil(*std::min_element(bits_per_k.begin(), bits_per_k.end()));
+    std::cerr <<min_bits_per_k_cy_x << std::endl;
+    auto alphabet_bits = std::ceil(log2(n_alphabet));
+    auto states_bits = std::ceil(log2(n_states));
+    auto moves_bits = 2.0;
+
+    std::cerr <<n_alphabet << " " << n_states << std::endl;
+
+    auto c_algo = (alphabet_bits+states_bits+moves_bits)*(n_alphabet*n_states) + std::ceil(log2(number_iterations));
+    std::cerr <<c_algo << std::endl;
+    auto c = c_algo + min_bits_per_k_cy_x;
+
+    std::cout << c  << "," << strProcess.normalizer << std::endl;
+
+    return 0;
 }

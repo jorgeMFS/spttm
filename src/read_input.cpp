@@ -29,6 +29,12 @@ void ReadInput::getFileContent(std::string fileName){
             vecOfStrs.push_back(str);
         }
     }
+    //for (auto &el : vecOfStrs){
+    //    std::cerr <<el << " " << std::endl;
+    //}
+    //std::cerr << vecOfchrs.size() << std::endl;
+    //std::cerr << vecOfStrs[0].size() << std::endl;
+    
     //Close The File
     in.close();
 }

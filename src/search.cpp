@@ -142,7 +142,7 @@ std::pair<double, double> Search::test_machine(StateMatrix &st, AllInteractiveMa
     all_models.reset();
     for (auto i = 0u; i < tapes_iter_short ; ++i){
         TapeMoves tpMove = tm.act(); // grave esti antaŭe
-        all_models.update_tables(tpMove, tm.turingTape);
+        all_models.update_tables(tpMove, tm.turingTape); // slows a lot at the current state
     }
 
     std::vector<MarkovTable> mkv_vector=all_models.get_markov_tables();

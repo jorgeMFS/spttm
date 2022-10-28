@@ -90,7 +90,9 @@ unsigned int StringProcess::cardinality() const {
 }
 
 void StringProcess::normalization_base(){
-  this->normalizer = this->transcribed_vectors[0].size() * DEFAULT_LOG2_CARD_LUT.log2(this->m_cardinality); // can be used log_2 table..
+  std::cerr << "size of string " << this->transcribed_vectors[0].size() << std::endl;
+
+  this->normalizer = this->transcribed_vectors[0].size() * log2(this->m_cardinality); // can be used log_2 table..
 }
 
 
@@ -102,6 +104,20 @@ std::vector<double> StringProcess::readinput(MarkovTable& markovTable) const {
       value += markovTable.probability(&*it);
     }
     nrc_values.push_back(value/this->normalizer);
+  }
+
+  markovTable.reset();
+  return nrc_values;
+}
+
+std::vector<double> StringProcess::readinput_cd(MarkovTable& markovTable) const {
+  std::vector<double> nrc_values;
+  for (auto vec: this->transcribed_vectors){
+    double value = 0;
+    for(auto it = vec.begin(); it!= vec.end() - markovTable.k; ++it){
+      value += markovTable.probability(&*it);
+    }
+    nrc_values.push_back(value);
   }
 
   markovTable.reset();
@@ -166,12 +182,12 @@ double StringProcess::calculateLog(double index_value, double index_sum){
 unsigned int StringProcess::maximum_cardinality_verifier(size_t alphabet_size){
   auto alphsz = convert_szt_to_ui(alphabet_size);
   if ( this->m_cardinality > alphsz ){
-    printf ("Input string has elements larger (%u) that the alphabet size (%u) [0-%u] \n", this->m_cardinality, alphsz , alphsz - 1);
-    printf ("Assuming cardinality of the input string (%u) --> [0-%u] \n",this->m_cardinality, this->m_cardinality - 1);
+  //  printf ("Input string has elements larger (%u) that the alphabet size (%u) [0-%u] \n", this->m_cardinality, alphsz , alphsz - 1);
+  //  printf ("Assuming cardinality of the input string (%u) --> [0-%u] \n",this->m_cardinality, this->m_cardinality - 1);
   }
   else if( this->m_cardinality < alphsz ){
-    printf ("The alphabet size (%u) is larger than the input string cardinality (%u) that  [0-%u] \n", alphsz, this->m_cardinality , this->m_cardinality - 1);
-    printf ("Assuming default cardinality (%u) --> [0-%u] \n",alphsz, alphsz - 1);
+    //printf ("The alphabet size (%u) is larger than the input string cardinality (%u) that  [0-%u] \n", alphsz, this->m_cardinality , this->m_cardinality - 1);
+    //printf ("Assuming default cardinality (%u) --> [0-%u] \n",alphsz, alphsz - 1);
     this->m_cardinality = alphsz;
   }
   return this->m_cardinality;
@@ -246,6 +262,7 @@ void StringProcess::get_input_content_from_file(std::string input_file){
   
   ReadInput read_input(input_file);
   original_input_vector = read_input.get_input_vector();
+  std::cerr<< "Size of original input :" <<original_input_vector.size()<<std::endl;
 
   if (this->original_input_vector.empty()) {
     std::cerr << "Input file/string not provided"<< std::endl; 
