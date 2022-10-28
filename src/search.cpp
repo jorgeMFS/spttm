@@ -523,7 +523,7 @@ std::vector<std::pair<std::string, double>> Search::TreeSearch(TmId traversal_le
         //i++;
         if((i++ % 100000)==0){//std::cerr<<"counter: "<<counter<< " i : "<< i << " Worker: "<< threadId<<std::endl;
           //std::cerr<< "St. String :"<< currentNode.identifier <<"; Cost : " <<currentNode.cost<< " Worker: "<< threadId <<std::endl;
-          std::cerr<<"Cost : " <<currentNode.cost<< " T machines " << i << "20-Top result: " << topKresult.topFoundResults.top().first <<" Worker: "<< threadId <<std::endl;
+          std::cerr<<"Cost : " <<currentNode.cost<< " T machines " << i << " | 20-Top result: " << topKresult.topFoundResults.top().first <<" Worker: "<< threadId <<std::endl;
         }
         RuleMatrixNode newNode(sucessor.get_state_matrix_string(), loss_pair);
         nodesToOpen.push(newNode);
